@@ -1,29 +1,15 @@
 const API = {
   async _request(url, method, headers, body) {
-    const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-    if (isLocal) {
-      const resp = await fetch('/api/proxy', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ url, method, headers, body })
-      });
-      if (!resp.ok) {
-        const err = await resp.text().catch(() => '');
-        throw new Error(`Erro ${resp.status}: ${err.slice(0, 200)}`);
-      }
-      return resp.json();
-    }
-    const opts = { method, headers };
-    if (body) opts.body = body;
-    const resp = await fetch(url, opts);
+    const resp = await fetch('/api/proxy', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ url, method, headers, body })
+    });
     if (!resp.ok) {
       const err = await resp.text().catch(() => '');
       throw new Error(`Erro ${resp.status}: ${err.slice(0, 200)}`);
     }
-    const ct = resp.headers.get('content-type') || '';
-    if (ct.includes('application/json')) return resp.json();
-    const text = await resp.text();
-    try { return JSON.parse(text); } catch { return text; }
+    return resp.json();
   },
 
   async fetchModels(provider, apiKey) {
@@ -68,13 +54,13 @@ const API = {
     switch (provider) {
       case 'anthropic':
         return this._callAnthropic(fullMessages, model, apiKey);
-      case 'google': {
-        const googleUrl = `https://generativelanguage.googleapis.com/v1beta/openai/chat/completions?key=${apiKey}`;
-        return this._callOpenAICompatible(googleUrl, fullMessages, model, apiKey, { skipAuth: true });
-      }
+      case 'google':
+        return this._callOpenAICompatible(
+          `https://generativelanguage.googleapis.com/v1beta/openai/chat/completions?key=${apiKey}`,
+          fullMessages, model, apiKey, { skipAuth: true }
+        );
       default:
-        const config = UTILS.Providers[provider];
-        return this._callOpenAICompatible(config.baseUrl, fullMessages, model, apiKey);
+        return this._callOpenAICompatible(UTILS.Providers[provider].baseUrl, fullMessages, model, apiKey);
     }
   },
 
