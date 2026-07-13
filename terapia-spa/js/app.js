@@ -144,12 +144,22 @@
       models = UTILS.getModelsForProvider(provider);
     }
 
+    const preferred = UTILS.getModelsForProvider(provider);
+    let foundSelected = false;
+
     modelSelect.innerHTML = '';
     models.forEach(m => {
       const opt = document.createElement('option');
       opt.value = m;
       opt.textContent = m;
-      if (selected && m === selected) opt.selected = true;
+      if (selected && m === selected) {
+        opt.selected = true;
+        foundSelected = true;
+      }
+      if (!foundSelected && !selected && preferred.includes(m)) {
+        opt.selected = true;
+        foundSelected = true;
+      }
       modelSelect.appendChild(opt);
     });
   }
