@@ -22,6 +22,7 @@ export async function onRequest(context) {
       method: method || 'POST',
       headers: { ...headers },
       body: body || undefined,
+      cf: { cacheTtl: 0 },
     });
 
     const text = await resp.text();
