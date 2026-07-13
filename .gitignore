@@ -1,0 +1,8 @@
+node_modules/
+screenshot.png
+check.cjs
+check.mjs
+browser-state-*.json
+browser-state-*-fingerprint.json
+.DS_Store
+Thumbs.db
