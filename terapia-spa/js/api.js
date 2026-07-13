@@ -1,15 +1,29 @@
 const API = {
-  async _proxy(url, method, headers, body) {
-    const resp = await fetch('/api/proxy', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ url, method, headers, body })
-    });
+  async _request(url, method, headers, body) {
+    const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+    if (isLocal) {
+      const resp = await fetch('/api/proxy', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ url, method, headers, body })
+      });
+      if (!resp.ok) {
+        const err = await resp.text().catch(() => '');
+        throw new Error(`Erro ${resp.status}: ${err.slice(0, 200)}`);
+      }
+      return resp.json();
+    }
+    const opts = { method, headers };
+    if (body) opts.body = body;
+    const resp = await fetch(url, opts);
     if (!resp.ok) {
       const err = await resp.text().catch(() => '');
       throw new Error(`Erro ${resp.status}: ${err.slice(0, 200)}`);
     }
-    return resp.json();
+    const ct = resp.headers.get('content-type') || '';
+    if (ct.includes('application/json')) return resp.json();
+    const text = await resp.text();
+    try { return JSON.parse(text); } catch { return text; }
   },
 
   async fetchModels(provider, apiKey) {
@@ -25,7 +39,7 @@ const API = {
       if (cfg.needsAuth && apiKey) {
         headers['Authorization'] = `Bearer ${apiKey}`;
       }
-      const data = await this._proxy(cfg.url, 'GET', headers, null);
+      const data = await this._request(cfg.url, 'GET', headers, null);
       const models = (data.data || []).map(m => m.id || m).filter(Boolean);
       return models.length > 0 ? models : null;
     } catch {
@@ -56,11 +70,11 @@ const API = {
         return this._callAnthropic(fullMessages, model, apiKey);
       case 'google': {
         const googleUrl = `https://generativelanguage.googleapis.com/v1beta/openai/chat/completions?key=${apiKey}`;
-        return this._callOpenAICompatible(googleUrl, fullMessages, model, apiKey, { skipAuth: true, useProxy: true });
+        return this._callOpenAICompatible(googleUrl, fullMessages, model, apiKey, { skipAuth: true });
       }
       default:
         const config = UTILS.Providers[provider];
-        return this._callOpenAICompatible(config.baseUrl, fullMessages, model, apiKey, { useProxy: true });
+        return this._callOpenAICompatible(config.baseUrl, fullMessages, model, apiKey);
     }
   },
 
@@ -81,7 +95,7 @@ const API = {
       headers['Authorization'] = `Bearer ${apiKey}`;
     }
 
-    const data = await this._proxy(baseUrl, 'POST', headers, JSON.stringify(body));
+    const data = await this._request(baseUrl, 'POST', headers, JSON.stringify(body));
 
     if (data.choices && data.choices[0] && data.choices[0].message) {
       return data.choices[0].message.content;
@@ -113,7 +127,7 @@ const API = {
       'anthropic-version': '2023-06-01'
     };
 
-    const data = await this._proxy('https://api.anthropic.com/v1/messages', 'POST', headers, JSON.stringify(body));
+    const data = await this._request('https://api.anthropic.com/v1/messages', 'POST', headers, JSON.stringify(body));
 
     if (data.error) throw new Error(data.error.message || 'Erro da API Anthropic');
     return data.content[0]?.text || '';
@@ -138,7 +152,7 @@ const API = {
         const url = provider === 'google'
           ? `https://generativelanguage.googleapis.com/v1beta/openai/chat/completions?key=${apiKey}`
           : config.baseUrl;
-        await this._callOpenAICompatible(url, testMessages, model, apiKey, { skipAuth: provider === 'google', useProxy: true });
+        await this._callOpenAICompatible(url, testMessages, model, apiKey, { skipAuth: provider === 'google' });
       }
       return { ok: true };
     } catch (err) {
