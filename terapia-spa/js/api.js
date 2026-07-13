@@ -5,11 +5,15 @@ const API = {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ url, method, headers, body })
     });
-    if (!resp.ok) {
-      const err = await resp.text().catch(() => '');
-      throw new Error(`Erro ${resp.status}: ${err.slice(0, 200)}`);
+    const data = await resp.json();
+    if (data.upstreamStatus && data.upstreamStatus >= 400) {
+      const err = typeof data.body === 'string' ? data.body.slice(0, 200) : '';
+      throw new Error(`Erro ${data.upstreamStatus}: ${err}`);
     }
-    return resp.json();
+    if (data.upstreamStatus) {
+      try { return JSON.parse(data.body); } catch { return data.body; }
+    }
+    return data;
   },
 
   async fetchModels(provider, apiKey) {

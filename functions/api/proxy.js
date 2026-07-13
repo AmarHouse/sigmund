@@ -22,14 +22,21 @@ export async function onRequest(context) {
       headers: { ...headers },
       body: body || undefined,
     });
+
     const text = await resp.text();
-    return new Response(text, {
-      status: resp.status,
+    return new Response(JSON.stringify({
+      upstreamStatus: resp.status,
+      body: text,
+    }), {
+      status: 200,
       headers: { 'Content-Type': 'application/json', ...CORS },
     });
   } catch (e) {
-    return new Response(JSON.stringify({ error: e.message }), {
-      status: 500,
+    return new Response(JSON.stringify({
+      upstreamStatus: 500,
+      body: JSON.stringify({ error: e.message }),
+    }), {
+      status: 200,
       headers: { 'Content-Type': 'application/json', ...CORS },
     });
   }
