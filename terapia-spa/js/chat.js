@@ -124,8 +124,8 @@ const Chat = {
 
       this._removeTypingIndicator(msgEl);
 
-      const notesMatch = response.match(/<!--\s*NOTES:\s*([\s\S]*?)-->/);
-      const summaryMatch = response.match(/<!--\s*SUMMARY:\s*([\s\S]*?)-->/);
+      const notesMatch = response.match(/<!--\s*notes:\s*([\s\S]*?)-->/i);
+      const summaryMatch = response.match(/<!--\s*summary:\s*([\s\S]*?)-->/i);
       let cleanResponse = response;
       if (summaryMatch) {
         SessionManager.updateSummary(summaryMatch[1].trim());
@@ -138,6 +138,7 @@ const Chat = {
       if (summaryMatch || notesMatch) {
         SessionManager.markFirstSessionDone();
       }
+      cleanResponse = cleanResponse.replace(/<!--[\s\S]*?-->/g, '').trim();
 
       const role = 'assistant';
       SessionManager.addMessage(role, cleanResponse, route.kbIds);
