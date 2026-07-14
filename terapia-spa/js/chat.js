@@ -135,9 +135,6 @@ const Chat = {
         SessionManager.updateNotes(notesMatch[1].trim());
         cleanResponse = cleanResponse.replace(notesMatch[0], '').trim();
       }
-      if (summaryMatch || notesMatch) {
-        SessionManager.markFirstSessionDone();
-      }
       cleanResponse = cleanResponse.replace(/<!--[\s\S]*?-->/g, '').trim();
 
       const role = 'assistant';
