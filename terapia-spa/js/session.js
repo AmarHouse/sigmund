@@ -128,7 +128,7 @@ const SessionManager = {
     let currentContent = [];
 
     for (const line of lines) {
-      if (line.startsWith('### 👤 Cliente')) {
+      if (line.startsWith('### 👤 Cliente') || line.startsWith('### 👤 Usuário')) {
         if (currentRole && currentContent.length) {
           messages.push({ role: currentRole, content: currentContent.join('\n').trim() });
         }
@@ -151,5 +151,27 @@ const SessionManager = {
     }
 
     return { title, messages };
+  },
+
+  mergeImportedMessages(messages) {
+    const session = this.current;
+    if (!session) return;
+    const imported = messages.map(m => ({
+      id: UTILS.id(),
+      role: m.role,
+      content: m.content,
+      timestamp: UTILS.timestamp(),
+      imported: true
+    }));
+    session.messages = [...imported, ...session.messages];
+    session.updated = UTILS.timestamp();
+    if (imported.length > 0) {
+      session.title = imported[0].content.slice(0, 60) + (imported[0].content.length > 60 ? '...' : '');
+    }
+  },
+
+  hasAnamnesis() {
+    const notes = this.getNotes();
+    return notes.length > 100;
   }
 };

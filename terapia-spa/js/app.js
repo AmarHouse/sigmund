@@ -22,6 +22,7 @@
     setupEmergency();
     setupHistory();
     setupExport();
+    setupImport();
     setupNewSession();
   }
 
@@ -249,6 +250,36 @@
         });
       });
     }
+  }
+
+  function setupImport() {
+    const btn = document.getElementById('importNavBtn');
+    const fileInput = document.getElementById('importFileInput');
+
+    btn.addEventListener('click', () => {
+      fileInput.click();
+    });
+
+    fileInput.addEventListener('change', async () => {
+      const file = fileInput.files?.[0];
+      if (!file) return;
+
+      try {
+        const text = await file.text();
+        const parsed = SessionManager.importFromMarkdown(text);
+        if (parsed.messages.length === 0) {
+          showToast('Arquivo vazio ou formato inválido');
+          return;
+        }
+
+        SessionManager.mergeImportedMessages(parsed.messages);
+        Chat.loadSession(SessionManager.current.messages);
+        fileInput.value = '';
+        showToast(`${parsed.messages.length} mensagens importadas`);
+      } catch (e) {
+        showToast('Erro ao importar: formato inválido');
+      }
+    });
   }
 
   function setupExport() {
