@@ -5,13 +5,11 @@ const SessionManager = {
   _counter: 0,
 
   init() {
-    this._counter = UTILS.storage.get('session_counter', 0);
     this.create();
   },
 
   create() {
     this._counter++;
-    UTILS.storage.set('session_counter', this._counter);
     const session = {
       id: UTILS.id(),
       number: this._counter,
