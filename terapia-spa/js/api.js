@@ -37,7 +37,7 @@ const API = {
     }
   },
 
-  async call(messages, kbContext, kbIds, intent, currentNotes) {
+  async call(messages, kbContext, kbIds, intent, currentNotes, currentSummary) {
     const provider = UTILS.storage.get('provider', 'openrouter');
     const model = UTILS.storage.get('model', 'openai/gpt-4o-mini');
     const apiKey = UTILS.storage.get('api_key', '');
@@ -46,7 +46,7 @@ const API = {
       throw new Error('Chave de API não configurada. Vá em Configurações e adicione sua chave.');
     }
 
-    const systemPrompt = Prompts.getSystemPrompt(intent, kbContext, kbIds, currentNotes);
+    const systemPrompt = Prompts.getSystemPrompt(intent, kbContext, kbIds, currentNotes, currentSummary);
     const contextSummary = Prompts.getContextSummary(messages);
 
     const fullMessages = [

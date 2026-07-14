@@ -272,8 +272,9 @@
           return;
         }
 
-        SessionManager.mergeImportedMessages(parsed.messages, parsed.notes);
+        SessionManager.mergeImportedMessages(parsed.messages, parsed.notes, parsed.summary);
         Chat.loadSession(SessionManager.current.messages);
+        Chat._hideWelcome();
         fileInput.value = '';
         showToast(`${parsed.messages.length} mensagens importadas`);
       } catch (e) {

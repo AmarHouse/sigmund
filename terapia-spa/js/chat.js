@@ -5,6 +5,25 @@ const Chat = {
   init() {
     this._renderWelcome();
     this._setupInput();
+    this._setupWelcomeButtons();
+  },
+
+  _setupWelcomeButtons() {
+    const firstBtn = document.getElementById('welcomeFirstSession');
+    const importBtn = document.getElementById('welcomeImport');
+    const fileInput = document.getElementById('importFileInput');
+
+    if (firstBtn) {
+      firstBtn.addEventListener('click', () => {
+        this._hideWelcome();
+      });
+    }
+
+    if (importBtn && fileInput) {
+      importBtn.addEventListener('click', () => {
+        fileInput.click();
+      });
+    }
   },
 
   _renderWelcome() {
@@ -70,14 +89,21 @@ const Chat = {
 
       const history = SessionManager.getContextWindow(20);
       const currentNotes = SessionManager.getNotes();
-      const response = await API.call(history, route.kbContext, route.kbIds, route.analysis.intent, currentNotes);
+      const currentSummary = SessionManager.getSummary();
+      const response = await API.call(history, route.kbContext, route.kbIds, route.analysis.intent, currentNotes, currentSummary);
 
       this._removeTypingIndicator(msgEl);
 
       const notesMatch = response.match(/<!--\s*NOTES:\s*([\s\S]*?)-->/);
-      const cleanResponse = notesMatch ? response.replace(notesMatch[0], '').trim() : response;
+      const summaryMatch = response.match(/<!--\s*SUMMARY:\s*([\s\S]*?)-->/);
+      let cleanResponse = response;
+      if (summaryMatch) {
+        SessionManager.updateSummary(summaryMatch[1].trim());
+        cleanResponse = cleanResponse.replace(summaryMatch[0], '').trim();
+      }
       if (notesMatch) {
         SessionManager.updateNotes(notesMatch[1].trim());
+        cleanResponse = cleanResponse.replace(notesMatch[0], '').trim();
       }
 
       const role = 'assistant';

@@ -1,5 +1,5 @@
 const Prompts = {
-  getSystemPrompt(type, kbContext, kbIds, currentNotes) {
+  getSystemPrompt(type, kbContext, kbIds, currentNotes, currentSummary) {
     const isFirstSession = !currentNotes || currentNotes.length < 20;
 
     let notesSection = '';
@@ -7,11 +7,28 @@ const Prompts = {
       notesSection = `\n══════════════════════════════\nNOTAS DA SESSÃO (confidenciais)\n══════════════════════════════\n\nSuas anotações da sessão até agora:\n\n${currentNotes}\n\n`;
     }
 
-    const notesFooter = `${notesSection}══════════════════════════════
+    let summarySection = '';
+    if (currentSummary) {
+      summarySection = `\n══════════════════════════════\nHISTÓRICO DO ACOMPANHAMENTO\n══════════════════════════════\n\nRelato narrativo das sessões anteriores:\n\n${currentSummary}\n\n`;
+    }
+
+    const notesFooter = `${summarySection}${notesSection}══════════════════════════════
 NOTAS DA SESSÃO (não remova esta seção)
 ══════════════════════════════
 
-Ao final da sua resposta, atualize suas notas sobre a sessão. Use o formato:
+Ao final da sua resposta, mantenha o relato narrativo do acompanhamento e atualize suas notas sobre a sessão.
+
+RELATO NARRATIVO — Use o formato abaixo para ATUALIZAR o histórico completo do acompanhamento. Escreva um relato narrativo detalhado, incluindo citações literais quando relevantes, em terceira pessoa:
+
+<!-- SUMMARY:
+SESSÃO X - DATA
+Paciente relatou... Descreveu: "[citação literal]".
+Exploramos... Paciente respondeu...
+Principais temas: ...
+Plano: ...
+-->
+
+ANOTAÇÕES — Use o formato abaixo para notas clínicas confidenciais:
 
 <!-- NOTES:
 - Observações: ...
@@ -19,12 +36,10 @@ Ao final da sua resposta, atualize suas notas sobre a sessão. Use o formato:
 - A explorar: ...
 -->
 
-As notas são confidenciais e visíveis apenas para você. NUNCA mencione ao usuário que está fazendo anotações.`;
+As notas e o relato são confidenciais e visíveis apenas para você. NUNCA mencione ao usuário que está fazendo anotações. NUNCA se refira ao "relato narrativo", "summary" ou "sessão anterior" na conversa com o usuário.`;
 
     if (isFirstSession) {
-      return `Você é SIGMUND, um terapeuta virtual iniciando a primeira sessão com uma nova pessoa.
-
-Antes de mais nada, pergunte se a pessoa já teve sessões anteriores com você. Se ela tiver um arquivo .sgm de sessões anteriores, sugira importá-lo antes de começar. Se for realmente a primeira sessão, siga as orientações abaixo.
+      return `Você é SIGMUND, um terapeuta virtual em uma primeira sessão.
 
 O objetivo principal desta sessão é construir vínculo, compreender a situação da pessoa e reunir informações essenciais para entender seu contexto. A pessoa deve sentir que está conversando com alguém genuinamente interessado em compreendê-la, nunca que está respondendo a um questionário.
 

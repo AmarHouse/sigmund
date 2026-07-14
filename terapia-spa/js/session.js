@@ -20,7 +20,8 @@ const SessionManager = {
       updated: UTILS.timestamp(),
       messages: [],
       metadata: {},
-      _notes: ''
+      _notes: '',
+      _summary: ''
     };
     this.sessions.push(session);
     this.currentId = session.id;
@@ -78,6 +79,17 @@ const SessionManager = {
     return session ? session._notes : '';
   },
 
+  updateSummary(summary) {
+    const session = this.current;
+    if (!session) return;
+    session._summary = summary;
+  },
+
+  getSummary() {
+    const session = this.current;
+    return session ? session._summary : '';
+  },
+
   getContextWindow(limit = 20) {
     const session = this.current;
     if (!session) return [];
@@ -117,6 +129,15 @@ const SessionManager = {
       lines.push('');
     }
 
+    if (session._summary) {
+      lines.push('');
+      lines.push('---');
+      lines.push('');
+      lines.push('# sumario');
+      lines.push('');
+      lines.push(session._summary);
+    }
+
     if (session._notes) {
       lines.push('');
       lines.push('---');
@@ -143,13 +164,25 @@ const SessionManager = {
     const title = lines[0]?.replace(/^#\s*/, '') || 'Sessão importada';
     const messages = [];
     let notes = '';
+    let summary = '';
     let currentRole = null;
     let currentContent = [];
     let inNotes = false;
+    let inSummary = false;
 
     for (const line of lines) {
+      if (line.startsWith('# sumario')) {
+        inSummary = true;
+        inNotes = false;
+        continue;
+      }
       if (line.startsWith('# notas')) {
         inNotes = true;
+        inSummary = false;
+        continue;
+      }
+      if (inSummary) {
+        summary += line + '\n';
         continue;
       }
       if (inNotes) {
@@ -179,10 +212,10 @@ const SessionManager = {
       messages.push({ role: currentRole, content: currentContent.join('\n').trim() });
     }
 
-    return { title, messages, notes: notes.trim() };
+    return { title, messages, notes: notes.trim(), summary: summary.trim() };
   },
 
-  mergeImportedMessages(messages, notes) {
+  mergeImportedMessages(messages, notes, summary) {
     const session = this.current;
     if (!session) return;
     const imported = messages.map(m => ({
@@ -194,9 +227,8 @@ const SessionManager = {
     }));
     session.messages = [...imported, ...session.messages];
     session.updated = UTILS.timestamp();
-    if (notes) {
-      session._notes = notes + '\n\n' + session._notes;
-    }
+    if (summary) session._summary = summary;
+    if (notes) session._notes = notes + '\n\n' + session._notes;
     if (imported.length > 0) {
       const firstUser = imported.find(m => m.role === 'user');
       if (firstUser) {
