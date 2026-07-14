@@ -30,8 +30,32 @@ const Chat = {
   },
 
   _renderWelcome() {
-    const el = document.getElementById('welcomeScreen');
-    if (el) el.style.display = 'flex';
+    let el = document.getElementById('welcomeScreen');
+    if (el) {
+      el.style.display = 'flex';
+      return;
+    }
+    const container = document.getElementById('chatMessages');
+    if (!container) return;
+    container.insertAdjacentHTML('afterbegin', `
+      <div class="chat-welcome" id="welcomeScreen">
+        <div class="chat-welcome-icon">&#x1F9EC;</div>
+        <h1>SIGMUND</h1>
+        <p>Bem-vindo ao seu espaço de conversa. Aqui você pode falar sobre o que estiver sentindo, de forma livre e sem julgamentos.</p>
+        <div class="welcome-actions">
+          <button class="welcome-btn welcome-btn-primary" id="welcomeFirstSession">
+            <span class="welcome-btn-icon">&#x1F331;</span>
+            <span class="welcome-btn-label">Primeira sessão</span>
+            <span class="welcome-btn-desc">Começar do zero</span>
+          </button>
+          <button class="welcome-btn" id="welcomeImport">
+            <span class="welcome-btn-icon">&#x1F4C2;</span>
+            <span class="welcome-btn-label">Continuar sessão</span>
+            <span class="welcome-btn-desc">Importar arquivo .sgm</span>
+          </button>
+        </div>
+      </div>`);
+    this._setupWelcomeButtons();
   },
 
   _hideWelcome() {
@@ -201,7 +225,7 @@ const Chat = {
 
   clear() {
     const container = document.getElementById('chatMessages');
-    container.innerHTML = '';
+    container.querySelectorAll('.message').forEach(el => el.remove());
     this._renderWelcome();
   },
 
