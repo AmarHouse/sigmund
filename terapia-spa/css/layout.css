@@ -38,9 +38,7 @@
   width: 28px;
   height: 28px;
   border-radius: var(--radius-md);
-  background: var(--color-accent);
-  padding: 3px;
-  color: white;
+  object-fit: cover;
 }
 
 .app-header-right {
