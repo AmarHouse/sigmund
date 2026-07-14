@@ -152,23 +152,14 @@ const Router = {
 
   async route(text) {
     const analysis = this.analyzeInput(text);
-    const history = SessionManager.getContextWindow(6);
-    const kbNeeded = this.determineKB(analysis, history);
-
-    const loaded = {};
-    // KB temporariamente desativado para teste
-    // for (const id of kbNeeded.slice(0, 4)) {
-    //   const content = await KB.loadContent(id);
-    //   if (content) loaded[id] = content.slice(0, 2000);
-    // }
 
     this.lastIntent = analysis.intent;
-    this.lastContext = kbNeeded;
+    this.lastContext = [];
 
     return {
       analysis,
-      kbContext: loaded,
-      kbIds: kbNeeded,
+      kbContext: {},
+      kbIds: [],
       promptType: analysis.intent
     };
   }

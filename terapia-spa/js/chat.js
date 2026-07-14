@@ -68,7 +68,7 @@ const Chat = {
     try {
       const route = await Router.route(userText);
 
-      SessionManager.updateLastMessage(JSON.stringify(route.kbIds));
+      // SessionManager.updateLastMessage(JSON.stringify(route.kbIds));
 
       const history = SessionManager.getContextWindow(20);
       const response = await API.call(history, route.kbContext, route.kbIds, route.analysis.intent);
