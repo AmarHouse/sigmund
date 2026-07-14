@@ -158,9 +158,14 @@ const Chat = {
     const msgDiv = document.createElement('div');
     msgDiv.className = `message ${role}`;
 
-    const avatar = document.createElement('div');
+    const avatar = document.createElement(role === 'user' ? 'div' : 'img');
     avatar.className = 'message-avatar';
-    avatar.textContent = role === 'user' ? '👤' : '🧑';
+    if (role === 'user') {
+      avatar.textContent = '👤';
+    } else {
+      avatar.src = 'avatar.webp';
+      avatar.alt = 'SIGMUND';
+    }
 
     const contentDiv = document.createElement('div');
     contentDiv.className = 'message-content';
@@ -194,9 +199,10 @@ const Chat = {
     div.className = 'message-typing';
     div.id = 'typingIndicator';
 
-    const avatar = document.createElement('div');
+    const avatar = document.createElement('img');
     avatar.className = 'message-avatar';
-    avatar.textContent = '🤖';
+    avatar.src = 'avatar.webp';
+    avatar.alt = 'SIGMUND';
 
     const indicator = document.createElement('div');
     indicator.className = 'typing-indicator';
