@@ -114,21 +114,15 @@
         </svg>
         <span>Sessão</span>
       </button>
-      <button class="nav-item" data-view="history" role="tab" aria-selected="false">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
-        </svg>
-        <span>Histórico</span>
-      </button>
       <button class="nav-item" data-view="export" role="tab" aria-selected="false" id="exportNavBtn">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="10 12 14 12"/><line x1="12" y1="10" x2="12" y2="14"/>
         </svg>
         <span>Exportar</span>
       </button>
       <button class="nav-item" role="tab" id="importNavBtn">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="10 12 14 12"/><line x1="12" y1="10" x2="12" y2="14"/><polyline points="17 8 12 3 7 8"/>
         </svg>
         <span>Importar</span>
       </button>
@@ -223,16 +217,6 @@
     </div>
   </div>
 
-  <div class="session-modal-overlay modal-hidden" id="historyModal">
-    <div class="session-modal">
-      <div class="settings-header">
-        <h2>Histórico de Sessões</h2>
-        <button class="settings-close" id="historyClose">✕</button>
-      </div>
-      <div class="session-list" id="sessionList">
-      </div>
-    </div>
-  </div>
 
   <script src="js/utils.js"></script>
   <script src="js/session.js"></script>

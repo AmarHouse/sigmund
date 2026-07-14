@@ -20,7 +20,6 @@
     setupTheme();
     setupSettings();
     setupEmergency();
-    setupHistory();
     setupExport();
     setupImport();
     setupNewSession();
@@ -188,68 +187,6 @@
         });
       }
     });
-  }
-
-  function setupHistory() {
-    const navBtn = document.querySelector('[data-view="history"]');
-    const modal = document.getElementById('historyModal');
-    const close = document.getElementById('historyClose');
-    const list = document.getElementById('sessionList');
-
-    navBtn.addEventListener('click', () => {
-      renderHistoryList();
-      modal.classList.remove('modal-hidden');
-    });
-
-    close.addEventListener('click', () => closeModal(modal));
-    modal.addEventListener('click', (e) => {
-      if (e.target === modal) closeModal(modal);
-    });
-
-    function renderHistoryList() {
-      const sessions = SessionManager.getAll();
-      if (sessions.length === 0) {
-        list.innerHTML = '<div class="empty-state"><div class="empty-state-icon">📋</div><h3>Nenhuma sessão salva</h3><p>Suas sessões aparecerão aqui conforme você conversa.</p></div>';
-        return;
-      }
-      list.innerHTML = '';
-      sessions.forEach(s => {
-        const item = document.createElement('div');
-        item.className = 'session-item';
-        const msgCount = s.messages.length;
-        const lastTime = UTILS.formatTime(s.updated);
-        item.innerHTML = `
-          <div class="session-item-info">
-            <h3>${UTILS.escapeHtml(s.title)}</h3>
-            <p>${msgCount} mensagens • ${lastTime}</p>
-          </div>
-          <div class="session-item-actions">
-            <button class="session-item-btn" data-load="${s.id}" title="Carregar">▶</button>
-            <button class="session-item-btn danger" data-delete="${s.id}" title="Excluir">✕</button>
-          </div>
-        `;
-        list.appendChild(item);
-
-        item.querySelector('[data-load]').addEventListener('click', (e) => {
-          e.stopPropagation();
-          SessionManager.switchTo(s.id);
-          Chat.loadSession(s.messages);
-          updateSessionIndicator();
-          closeModal(modal);
-          showToast('Sessão carregada');
-        });
-
-        item.querySelector('[data-delete]').addEventListener('click', (e) => {
-          e.stopPropagation();
-          if (confirm(`Excluir "${s.title}"?`)) {
-            SessionManager.delete(s.id);
-            renderHistoryList();
-            Chat.loadSession(SessionManager.current?.messages || []);
-            updateSessionIndicator();
-          }
-        });
-      });
-    }
   }
 
   function setupImport() {
