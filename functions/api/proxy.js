@@ -17,13 +17,29 @@ export async function onRequest(context) {
 
   try {
     const { url, method, headers, body } = await request.json();
+
     const resp = await fetch(url, {
       method: method || 'POST',
-      headers: { ...headers },
+      headers: { ...headers, 'Accept': 'application/json' },
       body: body || undefined,
     });
 
     const text = await resp.text();
+
+    if (resp.status >= 400) {
+      const isCloudflarePage = text.includes('<!DOCTYPE') || text.includes('Cloudflare') || text.trim() === '404 page not found';
+      const cleanBody = isCloudflarePage
+        ? JSON.stringify({ error: `O provedor retornou erro ${resp.status}. Verifique se o modelo e a chave API estão corretos.` })
+        : text;
+      return new Response(JSON.stringify({
+        upstreamStatus: resp.status,
+        body: cleanBody,
+      }), {
+        status: 200,
+        headers: { 'Content-Type': 'application/json', ...CORS },
+      });
+    }
+
     return new Response(JSON.stringify({
       upstreamStatus: resp.status,
       body: text,
