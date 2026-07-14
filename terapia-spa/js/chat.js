@@ -124,18 +124,17 @@ const Chat = {
 
       this._removeTypingIndicator(msgEl);
 
-      const notesMatch = response.match(/<!--\s*notes:\s*([\s\S]*?)-->/i);
-      const summaryMatch = response.match(/<!--\s*summary:\s*([\s\S]*?)-->/i);
       let cleanResponse = response;
-      if (summaryMatch) {
-        SessionManager.updateSummary(summaryMatch[1].trim());
-        cleanResponse = cleanResponse.replace(summaryMatch[0], '').trim();
+      const commentIndex = response.indexOf('<!--');
+      if (commentIndex !== -1) {
+        const before = response.slice(0, commentIndex).trim();
+        const after = response.slice(commentIndex);
+        const summaryMatch = after.match(/<!--\s*summary:\s*([\s\S]*?)-->/i);
+        const notesMatch = after.match(/<!--\s*notes:\s*([\s\S]*?)-->/i);
+        if (summaryMatch) SessionManager.updateSummary(summaryMatch[1].trim());
+        if (notesMatch) SessionManager.updateNotes(notesMatch[1].trim());
+        cleanResponse = before;
       }
-      if (notesMatch) {
-        SessionManager.updateNotes(notesMatch[1].trim());
-        cleanResponse = cleanResponse.replace(notesMatch[0], '').trim();
-      }
-      cleanResponse = cleanResponse.replace(/<!--[\s\S]*?-->/g, '').trim();
 
       const role = 'assistant';
       SessionManager.addMessage(role, cleanResponse, route.kbIds);
