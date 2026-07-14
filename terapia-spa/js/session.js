@@ -2,14 +2,20 @@ const SessionManager = {
   currentId: null,
   sessions: [],
 
+  _counter: 0,
+
   init() {
+    this._counter = UTILS.storage.get('session_counter', 0);
+    this._counter++;
+    UTILS.storage.set('session_counter', this._counter);
     this.create();
   },
 
   create() {
     const session = {
       id: UTILS.id(),
-      title: 'Sessão ' + (this.sessions.length + 1),
+      number: this._counter,
+      title: 'Sessão ' + this._counter,
       created: UTILS.timestamp(),
       updated: UTILS.timestamp(),
       messages: [],
@@ -81,24 +87,29 @@ const SessionManager = {
     }));
   },
 
-  exportCurrent(format = 'markdown') {
+  getExportFilename() {
+    const session = this.current;
+    if (!session) return 'sessao.sgm';
+    const date = new Date(session.created).toISOString().slice(0, 10);
+    return `Sigmund - ${session.title} - ${date}.sgm`;
+  },
+
+  exportCurrent() {
     const session = this.current;
     if (!session || session.messages.length === 0) return null;
 
     const lines = [
       `# ${session.title}`,
-      '',
-      `**Data:** ${UTILS.formatDate(session.created)}`,
-      `**Duração:** ${this._getDuration(session)}`,
+      `- data: ${session.created}`,
+      `- duracao: ${this._getDuration(session)}`,
       '',
       '---',
       ''
     ];
 
     for (const msg of session.messages) {
-      const role = msg.role === 'user' ? '👤 Cliente' : '🧑 Terapeuta';
-      const time = UTILS.formatTime(msg.timestamp);
-      lines.push(`### ${role} (${time})`);
+      const role = msg.role === 'user' ? 'usuario' : 'terapeuta';
+      lines.push(`### ${role}`);
       lines.push('');
       lines.push(msg.content);
       lines.push('');
@@ -106,7 +117,14 @@ const SessionManager = {
       lines.push('');
     }
 
-    lines.push('*Sessão gerada pelo SIGMUND — não substitui acompanhamento profissional.*');
+    if (session._notes) {
+      lines.push('');
+      lines.push('---');
+      lines.push('');
+      lines.push('# notas');
+      lines.push('');
+      lines.push(session._notes);
+    }
 
     return lines.join('\n');
   },
@@ -120,21 +138,32 @@ const SessionManager = {
     return `${Math.floor(diff / 60)}h ${diff % 60}min`;
   },
 
-  importFromMarkdown(markdown) {
-    const lines = markdown.split('\n');
+  importFromMarkdown(text) {
+    const lines = text.split('\n');
     const title = lines[0]?.replace(/^#\s*/, '') || 'Sessão importada';
     const messages = [];
+    let notes = '';
     let currentRole = null;
     let currentContent = [];
+    let inNotes = false;
 
     for (const line of lines) {
-      if (line.startsWith('### 👤 Cliente') || line.startsWith('### 👤 Usuário')) {
+      if (line.startsWith('# notas')) {
+        inNotes = true;
+        continue;
+      }
+      if (inNotes) {
+        notes += line + '\n';
+        continue;
+      }
+
+      if (line.startsWith('### usuario') || line.startsWith('### 👤 Cliente') || line.startsWith('### 👤 Usuário')) {
         if (currentRole && currentContent.length) {
           messages.push({ role: currentRole, content: currentContent.join('\n').trim() });
         }
         currentRole = 'user';
         currentContent = [];
-      } else if (line.startsWith('### 🧑 Terapeuta') || line.startsWith('### 🤖 Terapeuta')) {
+      } else if (line.startsWith('### terapeuta') || line.startsWith('### 🧑 Terapeuta') || line.startsWith('### 🤖 Terapeuta')) {
         if (currentRole && currentContent.length) {
           messages.push({ role: currentRole, content: currentContent.join('\n').trim() });
         }
@@ -142,7 +171,7 @@ const SessionManager = {
         currentContent = [];
       } else if (line === '---') {
         continue;
-      } else if (currentRole && !line.startsWith('*Sessão gerada')) {
+      } else if (currentRole) {
         currentContent.push(line);
       }
     }
@@ -150,10 +179,10 @@ const SessionManager = {
       messages.push({ role: currentRole, content: currentContent.join('\n').trim() });
     }
 
-    return { title, messages };
+    return { title, messages, notes: notes.trim() };
   },
 
-  mergeImportedMessages(messages) {
+  mergeImportedMessages(messages, notes) {
     const session = this.current;
     if (!session) return;
     const imported = messages.map(m => ({
@@ -165,8 +194,14 @@ const SessionManager = {
     }));
     session.messages = [...imported, ...session.messages];
     session.updated = UTILS.timestamp();
+    if (notes) {
+      session._notes = notes + '\n\n' + session._notes;
+    }
     if (imported.length > 0) {
-      session.title = imported[0].content.slice(0, 60) + (imported[0].content.length > 60 ? '...' : '');
+      const firstUser = imported.find(m => m.role === 'user');
+      if (firstUser) {
+        session.title = firstUser.content.slice(0, 60) + (firstUser.content.length > 60 ? '...' : '');
+      }
     }
   },
 

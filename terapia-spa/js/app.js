@@ -272,7 +272,7 @@
           return;
         }
 
-        SessionManager.mergeImportedMessages(parsed.messages);
+        SessionManager.mergeImportedMessages(parsed.messages, parsed.notes);
         Chat.loadSession(SessionManager.current.messages);
         fileInput.value = '';
         showToast(`${parsed.messages.length} mensagens importadas`);
@@ -292,17 +292,17 @@
         return;
       }
 
-      const md = SessionManager.exportCurrent('markdown');
-      if (!md) {
+      const data = SessionManager.exportCurrent();
+      if (!data) {
         showToast('Nada para exportar');
         return;
       }
 
-      const blob = new Blob([md], { type: 'text/markdown;charset=utf-8' });
+      const blob = new Blob([data], { type: 'application/octet-stream' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `sessao-${session.id.slice(-6)}.md`;
+      a.download = SessionManager.getExportFilename();
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
