@@ -37,13 +37,8 @@
 .app-logo-icon {
   width: 28px;
   height: 28px;
-  background: var(--color-accent);
   border-radius: var(--radius-md);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-  font-size: 14px;
+  object-fit: cover;
 }
 
 .app-header-right {
