@@ -27,7 +27,7 @@ const Prompts = {
         focus = 'Ajude o usuário a explorar os sintomas relatados. Ofereça psicoeducação sobre o que ele está sentindo. Sugira perguntas para aprofundamento.';
         break;
       case 'greeting':
-        focus = 'Acolha o usuário calorosamente. Convide-o a compartilhar o que o trouxe aqui. Explique brevemente como a sessão funciona.';
+        focus = 'Acolha o usuário calorosamente. Convide-o a conversar sobre o que quiser. Explique brevemente como a sessão funciona.';
         break;
       case 'answer_question':
         focus = 'Integre a nova informação ao quadro já discutido. Atualize as hipóteses e faça novas perguntas para continuar a investigação.';

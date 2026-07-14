@@ -79,22 +79,22 @@ const UTILS = {
     openai: {
       name: 'OpenAI',
       baseUrl: 'https://api.openai.com/v1/chat/completions',
-      models: ['gpt-4o', 'gpt-4o-mini', 'gpt-4-turbo', 'o3-mini']
+      models: ['gpt-4o', 'gpt-4o-mini', 'o3-mini', 'gpt-4.1', 'gpt-4.1-mini']
     },
     anthropic: {
       name: 'Anthropic',
       baseUrl: 'https://api.anthropic.com/v1/messages',
-      models: ['claude-3-5-sonnet-20241022', 'claude-3-5-haiku-20241022']
+      models: ['claude-sonnet-4-20250514', 'claude-3-5-sonnet-20241022', 'claude-3-5-haiku-20241022']
     },
     nvidia: {
       name: 'NVIDIA NIM',
       baseUrl: 'https://integrate.api.nvidia.com/v1/chat/completions',
-      models: ['meta/llama-3.1-70b-instruct', 'mistralai/mistral-large', 'nvidia/llama-3.1-nemotron-70b-instruct']
+      models: ['meta/llama-3.1-70b-instruct', 'mistralai/mistral-large', 'nvidia/llama-3.1-nemotron-70b-instruct', 'deepseek-ai/deepseek-v4-flash', 'qwen/qwen-2.5-72b-instruct']
     },
     google: {
       name: 'Google Gemini',
       baseUrl: 'https://generativelanguage.googleapis.com/v1beta/openai/chat/completions',
-      models: ['gemini-2.0-flash', 'gemini-2.0-flash-lite', 'gemini-1.5-pro']
+      models: ['gemini-2.5-flash', 'gemini-2.5-pro', 'gemini-2.0-flash', 'gemini-1.5-pro']
     }
   },
 
