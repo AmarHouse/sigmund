@@ -16,7 +16,7 @@ const Chat = {
     if (firstBtn) {
       firstBtn.addEventListener('click', () => {
         this._hideWelcome();
-        const greeting = 'Olá! Que bom que você está aqui. Para começarmos, gostaria de saber como prefere ser chamado(a). Pode me contar um pouco sobre o que te trouxe até aqui?';
+        const greeting = 'Olá! Eu sou o SIGMUND, mas pode me chamar de Sig. Que bom que você está aqui. Para começarmos, gostaria de saber como prefere ser chamado(a). Pode me contar um pouco sobre o que te trouxe até aqui?';
         SessionManager.addMessage('assistant', greeting);
         this._addMessage('assistant', greeting);
       });
