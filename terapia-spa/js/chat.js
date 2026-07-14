@@ -37,10 +37,12 @@ const Chat = {
     }
     const container = document.getElementById('chatMessages');
     if (!container) return;
+    const firstNumber = SessionManager.current?.number || '';
     container.insertAdjacentHTML('afterbegin', `
       <div class="chat-welcome" id="welcomeScreen">
-        <div class="chat-welcome-icon">&#x1F9EC;</div>
+        <img class="chat-welcome-icon-img" src="icon.png" alt="SIGMUND">
         <h1>SIGMUND</h1>
+        ${firstNumber ? `<p class="welcome-session-label">Sessão ${firstNumber}</p>` : ''}
         <p>Bem-vindo ao seu espaço de conversa. Aqui você pode falar sobre o que estiver sentindo, de forma livre e sem julgamentos.</p>
         <div class="welcome-actions">
           <button class="welcome-btn welcome-btn-primary" id="welcomeFirstSession">

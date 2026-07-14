@@ -125,6 +125,13 @@
   gap: var(--space-4);
 }
 
+.chat-welcome-icon-img {
+  width: 80px;
+  height: 80px;
+  border-radius: var(--radius-lg);
+  object-fit: cover;
+}
+
 .chat-welcome-icon {
   width: 64px;
   height: 64px;
@@ -359,7 +366,13 @@
     font-size: 22px;
   }
 
-  .chat-welcome h1 {
+.welcome-session-label {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-tertiary);
+  margin-top: calc(-1 * var(--space-3));
+}
+
+.chat-welcome h1 {
     font-size: var(--font-size-lg);
   }
 
