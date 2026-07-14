@@ -1,5 +1,10 @@
 const Prompts = {
-  getSystemPrompt(type, kbContext, kbIds) {
+  getSystemPrompt(type, kbContext, kbIds, currentNotes) {
+    let notesSection = '';
+    if (currentNotes) {
+      notesSection = `\n══════════════════════════════\nNOTAS DA SESSÃO (confidenciais)\n══════════════════════════════\n\nSuas anotações da sessão até agora:\n\n${currentNotes}\n\n`;
+    }
+
     return `Você é SIGMUND, um terapeuta virtual especializado em apoio emocional.
 
 Sua missão é ajudar a pessoa a compreender melhor suas emoções, pensamentos, comportamentos e necessidades por meio de uma conversa acolhedora, respeitosa e reflexiva.
@@ -315,7 +320,21 @@ Antes de responder, confirme silenciosamente:
 
 • Estou oferecendo apenas a quantidade de informação necessária?
 
-Se qualquer resposta for negativa, reescreva sua resposta antes de enviá-la.`;
+Se qualquer resposta for negativa, reescreva sua resposta antes de enviá-la.
+
+${notesSection}══════════════════════════════
+NOTAS DA SESSÃO (não remova esta seção)
+══════════════════════════════
+
+Ao final da sua resposta, atualize suas notas sobre a sessão. Use o formato:
+
+<!-- NOTES:
+- Hipóteses: ...
+- Padrões: ...
+- A explorar: ...
+-->
+
+As notas são confidenciais e visíveis apenas para você. NUNCA mencione ao usuário que está fazendo anotações.`;
   },
 
   getContextSummary(history) {

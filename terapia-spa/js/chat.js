@@ -68,16 +68,21 @@ const Chat = {
     try {
       const route = await Router.route(userText);
 
-      // SessionManager.updateLastMessage(JSON.stringify(route.kbIds));
-
       const history = SessionManager.getContextWindow(20);
-      const response = await API.call(history, route.kbContext, route.kbIds, route.analysis.intent);
+      const currentNotes = SessionManager.getNotes();
+      const response = await API.call(history, route.kbContext, route.kbIds, route.analysis.intent, currentNotes);
 
       this._removeTypingIndicator(msgEl);
 
+      const notesMatch = response.match(/<!--\s*NOTES:\s*([\s\S]*?)-->/);
+      const cleanResponse = notesMatch ? response.replace(notesMatch[0], '').trim() : response;
+      if (notesMatch) {
+        SessionManager.updateNotes(notesMatch[1].trim());
+      }
+
       const role = 'assistant';
-      SessionManager.addMessage(role, response, route.kbIds);
-      this._addMessage(role, response);
+      SessionManager.addMessage(role, cleanResponse, route.kbIds);
+      this._addMessage(role, cleanResponse);
 
     } catch (err) {
       this._removeTypingIndicator(msgEl);

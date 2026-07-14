@@ -3,13 +3,7 @@ const SessionManager = {
   sessions: [],
 
   init() {
-    this.sessions = UTILS.storage.get('sessions', []);
-    const lastId = UTILS.storage.get('current_session');
-    if (lastId && this.sessions.some(s => s.id === lastId)) {
-      this.currentId = lastId;
-    } else {
-      this.create();
-    }
+    this.create();
   },
 
   create() {
@@ -19,11 +13,11 @@ const SessionManager = {
       created: UTILS.timestamp(),
       updated: UTILS.timestamp(),
       messages: [],
-      metadata: {}
+      metadata: {},
+      _notes: ''
     };
     this.sessions.push(session);
     this.currentId = session.id;
-    this.save();
     return session;
   },
 
@@ -34,7 +28,6 @@ const SessionManager = {
   switchTo(id) {
     if (this.sessions.some(s => s.id === id)) {
       this.currentId = id;
-      UTILS.storage.set('current_session', id);
       return true;
     }
     return false;
@@ -48,7 +41,6 @@ const SessionManager = {
       this.currentId = this.sessions.length > 0 ? this.sessions[this.sessions.length - 1].id : null;
       if (!this.currentId) this.create();
     }
-    this.save();
   },
 
   addMessage(role, content, kbContext = []) {
@@ -66,18 +58,18 @@ const SessionManager = {
     if (session.messages.length === 1 && role === 'user') {
       session.title = content.slice(0, 60) + (content.length > 60 ? '...' : '');
     }
-    this.save();
     return msg;
   },
 
-  updateLastMessage(content, append = false) {
+  updateNotes(notes) {
     const session = this.current;
-    if (!session || session.messages.length === 0) return;
-    const last = session.messages[session.messages.length - 1];
-    if (append) last.content += content;
-    else last.content = content;
-    session.updated = UTILS.timestamp();
-    this.save();
+    if (!session) return;
+    session._notes = notes;
+  },
+
+  getNotes() {
+    const session = this.current;
+    return session ? session._notes : '';
   },
 
   getContextWindow(limit = 20) {
@@ -87,11 +79,6 @@ const SessionManager = {
       role: m.role,
       content: m.content
     }));
-  },
-
-  save() {
-    UTILS.storage.set('sessions', this.sessions);
-    UTILS.storage.set('current_session', this.currentId);
   },
 
   exportCurrent(format = 'markdown') {
@@ -109,7 +96,7 @@ const SessionManager = {
     ];
 
     for (const msg of session.messages) {
-      const role = msg.role === 'user' ? '👤 Cliente' : '🤖 Terapeuta';
+      const role = msg.role === 'user' ? '👤 Cliente' : '🧑 Terapeuta';
       const time = UTILS.formatTime(msg.timestamp);
       lines.push(`### ${role} (${time})`);
       lines.push('');
@@ -133,7 +120,36 @@ const SessionManager = {
     return `${Math.floor(diff / 60)}h ${diff % 60}min`;
   },
 
-  getAll() {
-    return [...this.sessions].sort((a, b) => new Date(b.updated) - new Date(a.updated));
+  importFromMarkdown(markdown) {
+    const lines = markdown.split('\n');
+    const title = lines[0]?.replace(/^#\s*/, '') || 'Sessão importada';
+    const messages = [];
+    let currentRole = null;
+    let currentContent = [];
+
+    for (const line of lines) {
+      if (line.startsWith('### 👤 Cliente')) {
+        if (currentRole && currentContent.length) {
+          messages.push({ role: currentRole, content: currentContent.join('\n').trim() });
+        }
+        currentRole = 'user';
+        currentContent = [];
+      } else if (line.startsWith('### 🧑 Terapeuta') || line.startsWith('### 🤖 Terapeuta')) {
+        if (currentRole && currentContent.length) {
+          messages.push({ role: currentRole, content: currentContent.join('\n').trim() });
+        }
+        currentRole = 'assistant';
+        currentContent = [];
+      } else if (line === '---') {
+        continue;
+      } else if (currentRole && !line.startsWith('*Sessão gerada')) {
+        currentContent.push(line);
+      }
+    }
+    if (currentRole && currentContent.length) {
+      messages.push({ role: currentRole, content: currentContent.join('\n').trim() });
+    }
+
+    return { title, messages };
   }
 };
