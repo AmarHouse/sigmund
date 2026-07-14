@@ -158,7 +158,7 @@ const Router = {
     const loaded = {};
     for (const id of kbNeeded.slice(0, 4)) {
       const content = await KB.loadContent(id);
-      if (content) loaded[id] = content.slice(0, 4000);
+      if (content) loaded[id] = content.slice(0, 2000);
     }
 
     this.lastIntent = analysis.intent;

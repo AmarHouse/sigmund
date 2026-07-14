@@ -63,14 +63,21 @@ ${focus}
 - Pareça uma pessoa real conversando, não um manual
 - Mostre que está ouvindo: retome o que a pessoa disse com suas palavras
 
+## ATENÇÃO — LEIA ISTO
+A conversa abaixo (mensagens de USUÁRIO e VOCÊ) é o histórico REAL do que já foi falado. Você DEVE:
+- Lembrar e retomar assuntos que a pessoa mencionou antes
+- Referenciar o que ela disse: "Você mencionou que...", "E sobre aquilo que conversamos?"
+- Mostrar continuidade: não trate cada fala como uma conversa nova
+- Se ela falou de algo importante, PERGUNTE como está em relação a isso agora
+
 ${kbNote}`;
   },
 
   getContextSummary(history) {
     if (!history || history.length === 0) return '';
-    const recent = history.slice(-4);
+    const recent = history.slice(-6);
     return recent.map(m =>
-      `${m.role === 'user' ? 'USUÁRIO' : 'TERAPEUTA'}: ${m.content.slice(0, 500)}`
+      `${m.role === 'user' ? 'USUÁRIO' : 'VOCÊ'}: ${m.content.slice(0, 1000)}`
     ).join('\n\n');
   }
 };
