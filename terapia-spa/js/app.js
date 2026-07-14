@@ -312,13 +312,21 @@
   }
 
   function setupNewSession() {
-    const btn = document.getElementById('newSessionBtn');
-    btn.addEventListener('click', (e) => {
-      e.preventDefault();
-      SessionManager.create();
-      Chat.clear();
-      updateSessionIndicator();
-      showToast('Nova sessão iniciada');
+    const btns = [document.getElementById('newSessionBtn'), document.getElementById('newSessionBtn2')];
+
+    btns.forEach(btn => {
+      if (!btn) return;
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        const session = SessionManager.current;
+        if (session && session.messages.length > 0) {
+          if (!confirm('Tem certeza? Iniciar uma nova sessão apagará toda a conversa atual.\n\nExporte a sessão antes se quiser preservá-la.')) return;
+        }
+        SessionManager.create();
+        Chat.clear();
+        updateSessionIndicator();
+        showToast('Nova sessão iniciada');
+      });
     });
   }
 
