@@ -96,7 +96,7 @@ const Chat = {
 
     const avatar = document.createElement('div');
     avatar.className = 'message-avatar';
-    avatar.textContent = role === 'user' ? '👤' : '💭';
+    avatar.textContent = role === 'user' ? '👤' : '🧑';
 
     const contentDiv = document.createElement('div');
     contentDiv.className = 'message-content';
