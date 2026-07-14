@@ -93,7 +93,8 @@ const Chat = {
       const history = SessionManager.getContextWindow(20);
       const currentNotes = SessionManager.getNotes();
       const currentSummary = SessionManager.getSummary();
-      const response = await API.call(history, route.kbContext, route.kbIds, route.analysis.intent, currentNotes, currentSummary);
+      const isFirstSession = SessionManager.isFirstSession();
+      const response = await API.call(history, route.kbContext, route.kbIds, route.analysis.intent, currentNotes, currentSummary, isFirstSession);
 
       this._removeTypingIndicator(msgEl);
 
@@ -107,6 +108,9 @@ const Chat = {
       if (notesMatch) {
         SessionManager.updateNotes(notesMatch[1].trim());
         cleanResponse = cleanResponse.replace(notesMatch[0], '').trim();
+      }
+      if (summaryMatch || notesMatch) {
+        SessionManager.markFirstSessionDone();
       }
 
       const role = 'assistant';

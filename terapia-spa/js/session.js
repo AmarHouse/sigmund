@@ -6,12 +6,12 @@ const SessionManager = {
 
   init() {
     this._counter = UTILS.storage.get('session_counter', 0);
-    this._counter++;
-    UTILS.storage.set('session_counter', this._counter);
     this.create();
   },
 
   create() {
+    this._counter++;
+    UTILS.storage.set('session_counter', this._counter);
     const session = {
       id: UTILS.id(),
       number: this._counter,
@@ -20,12 +20,23 @@ const SessionManager = {
       updated: UTILS.timestamp(),
       messages: [],
       metadata: {},
+      _isFirstSession: true,
       _notes: '',
       _summary: ''
     };
     this.sessions.push(session);
     this.currentId = session.id;
     return session;
+  },
+
+  markFirstSessionDone() {
+    const session = this.current;
+    if (session) session._isFirstSession = false;
+  },
+
+  isFirstSession() {
+    const session = this.current;
+    return session ? session._isFirstSession : true;
   },
 
   get current() {
@@ -106,6 +117,16 @@ const SessionManager = {
     return `Sigmund - ${session.title} - ${date}.sgm`;
   },
 
+  _autoSummary(messages) {
+    const lines = [];
+    for (const msg of messages.slice(-20)) {
+      const prefix = msg.role === 'user' ? 'P' : 'T';
+      const text = msg.content.slice(0, 200).replace(/\n/g, ' ');
+      lines.push(`${prefix}: ${text}`);
+    }
+    return lines.join('\n');
+  },
+
   exportCurrent() {
     const session = this.current;
     if (!session || session.messages.length === 0) return null;
@@ -136,6 +157,13 @@ const SessionManager = {
       lines.push('# sumario');
       lines.push('');
       lines.push(session._summary);
+    } else if (session.messages.length > 2) {
+      lines.push('');
+      lines.push('---');
+      lines.push('');
+      lines.push('# sumario');
+      lines.push('');
+      lines.push(this._autoSummary(session.messages));
     }
 
     if (session._notes) {

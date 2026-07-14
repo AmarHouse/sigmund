@@ -1,6 +1,5 @@
 const Prompts = {
-  getSystemPrompt(type, kbContext, kbIds, currentNotes, currentSummary) {
-    const isFirstSession = !currentNotes || currentNotes.length < 20;
+  getSystemPrompt(type, kbContext, kbIds, currentNotes, currentSummary, isFirstSession = true) {
 
     let notesSection = '';
     if (currentNotes) {
