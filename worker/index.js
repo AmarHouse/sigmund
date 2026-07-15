@@ -52,6 +52,16 @@ export default {
       return handleStripeWebhook(request, env);
     }
 
+    // Create Stripe Checkout Session
+    if (url.pathname === '/api/create-checkout' && request.method === 'POST') {
+      return handleCreateCheckout(request, env);
+    }
+
+    // Purchase extra session
+    if (url.pathname === '/api/purchase-extra' && request.method === 'POST') {
+      return handlePurchaseExtra(request, env);
+    }
+
     // Main proxy endpoint
     if (url.pathname === '/api/proxy' && request.method === 'POST') {
       return handleProxy(request, env);
@@ -86,6 +96,100 @@ async function handleStripeWebhook(request, env) {
   } catch (e) {
     return new Response(JSON.stringify({ error: e.message }), {
       status: 400,
+      headers: { 'Content-Type': 'application/json', ...CORS_HEADERS },
+    });
+  }
+}
+
+async function stripeRequest(path, method, body, env) {
+  const key = env.STRIPE_SECRET_KEY;
+  if (!key) {
+    return new Response(JSON.stringify({ error: 'Stripe não configurado' }), {
+      status: 200,
+      headers: { 'Content-Type': 'application/json', ...CORS_HEADERS },
+    });
+  }
+
+  const resp = await fetch(`https://api.stripe.com/v1${path}`, {
+    method,
+    headers: {
+      'Authorization': `Bearer ${key}`,
+      'Content-Type': 'application/x-www-form-urlencoded',
+    },
+    body: body ? new URLSearchParams(body).toString() : undefined,
+  });
+
+  const data = await resp.json();
+  return new Response(JSON.stringify(data), {
+    status: resp.ok ? 200 : 400,
+    headers: { 'Content-Type': 'application/json', ...CORS_HEADERS },
+  });
+}
+
+async function handleCreateCheckout(request, env) {
+  try {
+    const { plan, success_url, cancel_url } = await request.json();
+
+    const prices = {
+      premium: { price: 4900, name: 'SIGMUND Premium' },
+      wl_essential: { price: 9700, name: 'SIGMUND White Label Essential' },
+      wl_pro: { price: 19700, name: 'SIGMUND White Label Pro' },
+    };
+
+    const selected = prices[plan];
+    if (!selected) {
+      return new Response(JSON.stringify({ error: 'Plano inválido' }), {
+        status: 200,
+        headers: { 'Content-Type': 'application/json', ...CORS_HEADERS },
+      });
+    }
+
+    return stripeRequest('/checkout/sessions', 'POST', {
+      mode: 'subscription',
+      payment_method_types: ['card'],
+      line_items: JSON.stringify([{
+        price_data: {
+          currency: 'brl',
+          product_data: { name: selected.name },
+          recurring: { interval: 'month' },
+          unit_amount: selected.price,
+        },
+        quantity: 1,
+      }]),
+      success_url: success_url || 'https://sigmund.app/success',
+      cancel_url: cancel_url || 'https://sigmund.app/',
+      metadata: { plan, source: 'sigmund_web' },
+    }, env);
+  } catch (e) {
+    return new Response(JSON.stringify({ error: e.message }), {
+      status: 200,
+      headers: { 'Content-Type': 'application/json', ...CORS_HEADERS },
+    });
+  }
+}
+
+async function handlePurchaseExtra(request, env) {
+  try {
+    const { success_url } = await request.json();
+
+    return stripeRequest('/checkout/sessions', 'POST', {
+      mode: 'payment',
+      payment_method_types: ['card'],
+      line_items: JSON.stringify([{
+        price_data: {
+          currency: 'brl',
+          product_data: { name: 'SIGMUND — Sessão Extra' },
+          unit_amount: 2000,
+        },
+        quantity: 1,
+      }]),
+      success_url: success_url || 'https://sigmund.app/success',
+      cancel_url: 'https://sigmund.app/',
+      metadata: { type: 'extra_session', source: 'sigmund_web' },
+    }, env);
+  } catch (e) {
+    return new Response(JSON.stringify({ error: e.message }), {
+      status: 200,
       headers: { 'Content-Type': 'application/json', ...CORS_HEADERS },
     });
   }
