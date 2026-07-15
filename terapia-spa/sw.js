@@ -2,7 +2,7 @@ const CACHE = 'sigmund-v1';
 const ASSETS = [
   '/',
   '/index.html',
-  '/icon.png',
+  '/sigmund.webp',
   '/avatar.webp',
   '/user-avatar.png',
   '/manifest.json',
@@ -59,8 +59,8 @@ self.addEventListener('push', event => {
   event.waitUntil(
     self.registration.showNotification(data.title, {
       body: data.body,
-      icon: '/icon.png',
-      badge: '/icon.png',
+      icon: '/sigmund.webp',
+      badge: '/sigmund.webp',
       vibrate: [100, 50, 100],
     })
   );
