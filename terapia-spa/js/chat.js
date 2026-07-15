@@ -377,14 +377,10 @@ Quer continuar?`);
     const msgDiv = document.createElement('div');
     msgDiv.className = `message ${role}`;
 
-    const avatar = document.createElement(role === 'user' ? 'div' : 'img');
+    const avatar = document.createElement('img');
     avatar.className = 'message-avatar';
-    if (role === 'user') {
-      avatar.textContent = '👤';
-    } else {
-      avatar.src = 'avatar.webp';
-      avatar.alt = 'SIGMUND';
-    }
+    avatar.src = role === 'user' ? 'user-avatar.png' : 'avatar.webp';
+    avatar.alt = role === 'user' ? 'Você' : 'SIGMUND';
 
     const contentDiv = document.createElement('div');
     contentDiv.className = 'message-content';
@@ -430,26 +426,14 @@ Quer continuar?`);
 
     const body = document.createElement('div');
     body.className = 'message-body';
-    body.style.cssText = 'min-width:160px;display:flex;flex-direction:column;gap:8px;padding:var(--space-4) var(--space-5);';
+    body.style.cssText = 'min-width:80px;display:flex;align-items:center;gap:4px;padding:var(--space-4) var(--space-5);';
 
-    // "Pensando" text
-    const label = document.createElement('div');
-    label.style.cssText = 'font-size:var(--font-size-xs);color:var(--color-text-tertiary);font-weight:500;margin-bottom:2px;';
-    label.textContent = 'Pensando';
-    body.appendChild(label);
-
-    // Skeleton bars with better animation
-    const lines = [
-      { width: '85%', height: '10px' },
-      { width: '55%', height: '10px' },
-      { width: '70%', height: '10px' },
-    ];
-    lines.forEach(l => {
-      const bar = document.createElement('div');
-      bar.className = 'typing-bar';
-      bar.style.cssText = `width:${l.width};height:${l.height}px;border-radius:6px;background:var(--color-border);`;
-      body.appendChild(bar);
-    });
+    for (let i = 0; i < 3; i++) {
+      const dot = document.createElement('div');
+      dot.className = 'typing-dot';
+      dot.style.cssText = `width:8px;height:8px;border-radius:50%;background:var(--color-text-tertiary);animation:typingDot 1.2s ease-in-out ${i * 0.2}s infinite;`;
+      body.appendChild(dot);
+    }
 
     contentDiv.appendChild(body);
     div.appendChild(avatar);

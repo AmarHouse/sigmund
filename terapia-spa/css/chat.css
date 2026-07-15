@@ -27,25 +27,16 @@
   margin-top: 4px;
 }
 
-.message-avatar[src] {
+.message-avatar {
   object-fit: cover;
 }
 
-.message-avatar:not([src]) {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 14px;
-}
-
-.message.ai .message-avatar:not([src]) {
+.message.ai .message-avatar {
   background: var(--color-accent-light);
-  color: var(--color-accent);
 }
 
 .message.user .message-avatar {
   background: var(--color-user-bubble);
-  color: var(--color-user-bubble-text);
 }
 
 .message-content {
