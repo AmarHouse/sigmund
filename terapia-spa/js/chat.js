@@ -237,7 +237,10 @@ Quer continuar?`);
             btn.innerHTML = '🎟️ Quero uma sessão extra (R$ 19,90)';
             btn.addEventListener('click', () => {
               if (typeof SIGMUND_STRIPE !== 'undefined') {
-                SIGMUND_STRIPE.purchaseExtra();
+                SIGMUND_STRIPE.purchaseExtra(window.location.href).then(r => {
+                  if (r.url) window.location.href = r.url;
+                  else showToast('Erro ao processar pagamento');
+                });
               }
             });
             lastMsg.appendChild(btn);

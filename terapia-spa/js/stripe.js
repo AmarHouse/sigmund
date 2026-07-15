@@ -53,106 +53,25 @@ const SIGMUND_STRIPE = {
 
   EXTRA_PRICE: 1990,
   EXTRA_LABEL: 'R$ 19,90',
-  _stripeLoaded: null,
 
-  async _loadStripe(publishableKey) {
-    if (this._stripeLoaded) return this._stripeLoaded;
-    if (typeof window.Stripe === 'undefined') {
-      await new Promise((resolve, reject) => {
-        const script = document.createElement('script');
-        script.src = 'https://js.stripe.com/v3/';
-        script.onload = resolve;
-        script.onerror = reject;
-        document.head.appendChild(script);
-      });
-    }
-    this._stripeLoaded = window.Stripe(publishableKey);
-    return this._stripeLoaded;
-  },
-
-  async _openEmbeddedCheckout(clientSecret, publishableKey) {
-    const existing = document.getElementById('stripeCheckoutOverlay');
-    if (existing) existing.remove();
-
-    const overlay = document.createElement('div');
-    overlay.id = 'stripeCheckoutOverlay';
-    overlay.style.cssText = `
-      position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.6);
-      display:flex;align-items:center;justify-content:center;z-index:2000;
-      padding:var(--space-4);
-    `;
-    overlay.addEventListener('click', e => { if (e.target === overlay) { close(); } });
-
-    const container = document.createElement('div');
-    container.id = 'stripeCheckoutContainer';
-    container.style.cssText = `
-      background:var(--color-surface);border-radius:var(--radius-xl);
-      width:100%;max-width:520px;min-height:400px;position:relative;
-      box-shadow:0 25px 80px rgba(0,0,0,0.3);overflow:hidden;
-    `;
-
-    const closeBtn = document.createElement('button');
-    closeBtn.innerHTML = '✕';
-    closeBtn.style.cssText = `
-      position:absolute;top:var(--space-3);right:var(--space-3);z-index:10;
-      background:var(--color-bg-soft);border:none;font-size:18px;cursor:pointer;
-      color:var(--color-text-tertiary);width:32px;height:32px;border-radius:var(--radius-full);
-      display:flex;align-items:center;justify-content:center;
-    `;
-
-    const checkoutDiv = document.createElement('div');
-    checkoutDiv.id = 'embedded-checkout';
-    checkoutDiv.style.cssText = 'padding:var(--space-5);min-height:400px;';
-
-    container.appendChild(closeBtn);
-    container.appendChild(checkoutDiv);
-    overlay.appendChild(container);
-    document.body.appendChild(overlay);
-
-    const close = () => { overlay.remove(); this._stripeLoaded = null; };
-
-    closeBtn.addEventListener('click', close);
-
-    try {
-      const stripe = await this._loadStripe(publishableKey);
-      const checkout = await stripe.initEmbeddedCheckout({ clientSecret });
-      checkout.mount('#embedded-checkout');
-      checkout.on('complete', () => {
-        setTimeout(() => {
-          close();
-          showToast('✅ Pagamento confirmado! Bem-vindo ao Premium.');
-          setTimeout(() => location.reload(), 1500);
-        }, 500);
-      });
-    } catch (e) {
-      showToast('Erro ao abrir pagamento. Tente novamente.');
-      close();
-    }
-  },
-
-  async createCheckoutSession(planId) {
+  async createCheckoutSession(planId, successUrl, cancelUrl) {
     const userId = UTILS.storage.get('user_id', '');
     const resp = await fetch('/api/create-checkout', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ plan: planId, user_id: userId }),
+      body: JSON.stringify({ plan: planId, success_url: successUrl, cancel_url: cancelUrl, user_id: userId }),
     });
     return resp.json();
   },
 
-  async purchaseExtra() {
+  async purchaseExtra(successUrl) {
     const userId = UTILS.storage.get('user_id', '');
     const resp = await fetch('/api/purchase-extra', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ user_id: userId }),
+      body: JSON.stringify({ success_url: successUrl, user_id: userId }),
     });
-    const result = await resp.json();
-    if (result.client_secret && result.publishable_key) {
-      await this._openEmbeddedCheckout(result.client_secret, result.publishable_key);
-    } else {
-      showToast('Erro ao processar pagamento');
-    }
+    return resp.json();
   },
 
   _renderPlanCard(plan) {
@@ -214,12 +133,14 @@ const SIGMUND_STRIPE = {
 
     modal.querySelectorAll('.plan-card').forEach(card => {
       card.addEventListener('click', async () => {
-        const planId = card.dataset.plan;
+        const planEl = card.closest('[data-plan-section]');
+        const planMap = { premium: 'premium', wl_essential: 'wl_essential', wl_pro: 'wl_pro' };
+        const planId = planMap[card.dataset.plan] || card.dataset.plan;
         if (!planId) return;
-        const result = await SIGMUND_STRIPE.createCheckoutSession(planId);
-        if (result.client_secret && result.publishable_key) {
-          overlay.remove();
-          await SIGMUND_STRIPE._openEmbeddedCheckout(result.client_secret, result.publishable_key);
+        const origin = window.location.origin;
+        const result = await SIGMUND_STRIPE.createCheckoutSession(planId, `${origin}/?success=true`, `${origin}/`);
+        if (result.url) {
+          window.location.href = result.url;
         } else {
           showToast('Erro ao criar sessão de pagamento. Tente novamente.');
         }
@@ -284,13 +205,4 @@ const SIGMUND_STRIPE = {
   }
 };
 
-// Handle return from embedded checkout
-(function() {
-  if (window.location.search.includes('payment=complete')) {
-    setTimeout(() => {
-      showToast('✅ Pagamento confirmado! Bem-vindo ao Premium.');
-      history.replaceState(null, '', window.location.pathname);
-      setTimeout(() => location.reload(), 1500);
-    }, 500);
-  }
-})();
+
