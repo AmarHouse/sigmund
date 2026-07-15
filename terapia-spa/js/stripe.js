@@ -53,6 +53,56 @@ const SIGMUND_STRIPE = {
 
   EXTRA_PRICE: 1990,
   EXTRA_LABEL: 'R$ 19,90',
+  _stripeLoaded: null,
+
+  async _loadStripe(publishableKey) {
+    if (this._stripeLoaded) return this._stripeLoaded;
+    if (typeof window.Stripe === 'undefined') {
+      await new Promise((resolve, reject) => {
+        const s = document.createElement('script');
+        s.src = 'https://js.stripe.com/v3/';
+        s.onload = resolve;
+        s.onerror = reject;
+        document.head.appendChild(s);
+      });
+    }
+    this._stripeLoaded = window.Stripe(publishableKey);
+    return this._stripeLoaded;
+  },
+
+  async _openEmbeddedCheckout(clientSecret, publishableKey) {
+    const ov = document.getElementById('stripeCheckoutOverlay');
+    if (ov) ov.remove();
+    const overlay = document.createElement('div');
+    overlay.id = 'stripeCheckoutOverlay';
+    overlay.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.6);display:flex;align-items:center;justify-content:center;z-index:2000;padding:var(--space-4);';
+    overlay.addEventListener('click', e => { if (e.target === overlay) cleanup(); });
+    const c = document.createElement('div');
+    c.style.cssText = 'background:var(--color-surface);border-radius:var(--radius-xl);width:100%;max-width:520px;min-height:400px;position:relative;box-shadow:0 25px 80px rgba(0,0,0,0.3);overflow:hidden;';
+    const closeBtn = document.createElement('button');
+    closeBtn.innerHTML = '✕';
+    closeBtn.style.cssText = 'position:absolute;top:var(--space-3);right:var(--space-3);z-index:10;background:var(--color-bg-soft);border:none;font-size:18px;cursor:pointer;color:var(--color-text-tertiary);width:32px;height:32px;border-radius:var(--radius-full);display:flex;align-items:center;justify-content:center;';
+    const checkoutDiv = document.createElement('div');
+    checkoutDiv.id = 'embedded-checkout';
+    checkoutDiv.style.cssText = 'padding:var(--space-5);min-height:400px;';
+    c.appendChild(closeBtn);
+    c.appendChild(checkoutDiv);
+    overlay.appendChild(c);
+    document.body.appendChild(overlay);
+    const cleanup = () => { overlay.remove(); this._stripeLoaded = null; };
+    closeBtn.addEventListener('click', cleanup);
+    try {
+      const stripe = await this._loadStripe(publishableKey);
+      const checkout = await stripe.initEmbeddedCheckout({ clientSecret });
+      checkout.mount('#embedded-checkout');
+      checkout.on('complete', () => {
+        setTimeout(() => { cleanup(); showToast('✅ Pagamento confirmado!'); setTimeout(() => location.reload(), 1500); }, 500);
+      });
+    } catch (e) {
+      showToast('Erro ao abrir pagamento. Tente novamente.');
+      cleanup();
+    }
+  },
 
   async createCheckoutSession(planId, successUrl, cancelUrl) {
     const userId = UTILS.storage.get('user_id', '');
@@ -71,7 +121,14 @@ const SIGMUND_STRIPE = {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ success_url: successUrl, user_id: userId }),
     });
-    return resp.json();
+    const result = await resp.json();
+    if (result.client_secret && result.publishable_key) {
+      await this._openEmbeddedCheckout(result.client_secret, result.publishable_key);
+    } else if (result.url) {
+      window.location.href = result.url;
+    } else {
+      showToast('Erro ao processar pagamento');
+    }
   },
 
   _renderPlanCard(plan) {
@@ -139,7 +196,10 @@ const SIGMUND_STRIPE = {
         if (!planId) return;
         const origin = window.location.origin;
         const result = await SIGMUND_STRIPE.createCheckoutSession(planId, `${origin}/?success=true`, `${origin}/`);
-        if (result.url) {
+        if (result.client_secret && result.publishable_key) {
+          overlay.remove();
+          await SIGMUND_STRIPE._openEmbeddedCheckout(result.client_secret, result.publishable_key);
+        } else if (result.url) {
           window.location.href = result.url;
         } else {
           showToast('Erro ao criar sessão de pagamento. Tente novamente.');
