@@ -67,6 +67,11 @@ export default {
       return handleProxy(request, env);
     }
 
+    // White Label endpoints
+    if (url.pathname.startsWith('/api/wl/')) {
+      return handleWhiteLabel(request, url, env);
+    }
+
     // User session endpoint
     if (url.pathname === '/api/session' && request.method === 'GET') {
       return handleSessionCheck(request, env);
@@ -193,6 +198,148 @@ async function handlePurchaseExtra(request, env) {
       headers: { 'Content-Type': 'application/json', ...CORS_HEADERS },
     });
   }
+}
+
+function json(data, status = 200) {
+  return new Response(JSON.stringify(data), {
+    status,
+    headers: { 'Content-Type': 'application/json', ...CORS_HEADERS },
+  });
+}
+
+async function handleWhiteLabel(request, url, env) {
+  const cookies = parseCookies(request);
+  const userId = cookies.sigmund_session || request.headers.get('X-User-Id');
+  if (!userId) return json({ error: 'Não autenticado' }, 401);
+
+  const userKey = userKey(userId);
+  const userData = await env.SESSIONS.get(userKey, 'json');
+  if (!userData || !userData.plan?.startsWith('wl_')) {
+    return json({ error: 'Plano não autorizado' }, 403);
+  }
+
+  const path = url.pathname.replace('/api/wl/', '');
+  const parts = path.split('/');
+
+  // GET /api/wl/patients
+  if (path === 'patients' && request.method === 'GET') {
+    const patients = userData.patients || [];
+    return json({ patients });
+  }
+
+  // POST /api/wl/patients
+  if (path === 'patients' && request.method === 'POST') {
+    const { name, email } = await request.json();
+    if (!name) return json({ error: 'Nome é obrigatório' }, 400);
+
+    const patients = userData.patients || [];
+    const maxPatients = userData.plan === 'wl_pro' ? 60 : 30;
+    if (patients.length >= maxPatients) {
+      return json({ error: `Limite de ${maxPatients} pacientes atingido` });
+    }
+
+    const patientId = crypto.randomUUID();
+    patients.push({ id: patientId, name, email: email || '', created: new Date().toISOString(), sessions: [] });
+    userData.patients = patients;
+    await env.SESSIONS.put(userKey, JSON.stringify(userData));
+
+    return json({ ok: true, patient: { id: patientId, name, email } });
+  }
+
+  // GET /api/wl/patients/:id/sessions
+  if (parts.length === 3 && parts[2] === 'sessions' && request.method === 'GET') {
+    const patientId = parts[1];
+    const patients = userData.patients || [];
+    const patient = patients.find(p => p.id === patientId);
+    if (!patient) return json({ error: 'Paciente não encontrado' }, 404);
+
+    // Sessions are stored per-patient in KV
+    const patientSessionsKey = `sessions:${userId}:${patientId}`;
+    const sessionsData = await env.SESSIONS.get(patientSessionsKey, 'json');
+    return json({ sessions: sessionsData?.sessions || [] });
+  }
+
+  // POST /api/wl/patients/:id/email-report
+  if (parts.length === 3 && parts[3] === 'email-report' && request.method === 'POST') {
+    const patientId = parts[1];
+    const patients = userData.patients || [];
+    const patient = patients.find(p => p.id === patientId);
+    if (!patient) return json({ error: 'Paciente não encontrado' }, 404);
+
+    if (!patient.email) return json({ error: 'Paciente não tem email cadastrado' });
+
+    // Generate and send report email
+    const patientSessionsKey = `sessions:${userId}:${patientId}`;
+    const sessionsData = await env.SESSIONS.get(patientSessionsKey, 'json');
+    const sessions = sessionsData?.sessions || [];
+
+    if (sessions.length === 0) return json({ error: 'Nenhuma sessão para relatar' });
+
+    const lastSession = sessions[sessions.length - 1];
+    const summary = lastSession.summary || 'Resumo não disponível';
+
+    if (env.SENDGRID_API_KEY) {
+      await fetch('https://api.sendgrid.com/v3/mail/send', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${env.SENDGRID_API_KEY}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          personalizations: [{ to: [{ email: patient.email }] }],
+          from: { email: 'relatorios@sigmund.app', name: 'SIGMUND — Relatório' },
+          subject: `Relatório de Sessão - ${patient.name}`,
+          content: [{
+            type: 'text/plain',
+            value: `Olá,\n\nSegue o resumo da última sessão de ${patient.name}:\n\n${summary}\n\nAtenciosamente,\nSIGMUND`
+          }],
+        }),
+      });
+    }
+
+    return json({ ok: true });
+  }
+
+  // GET /api/wl/patients/:patientId/sessions/:sessionId/pdf
+  if (parts.length === 5 && parts[4] === 'pdf' && request.method === 'GET') {
+    const patientId = parts[1];
+    const sessionId = parts[3];
+
+    const patientSessionsKey = `sessions:${userId}:${patientId}`;
+    const sessionsData = await env.SESSIONS.get(patientSessionsKey, 'json');
+    const session = sessionsData?.sessions?.find(s => s.id === sessionId);
+    if (!session) return json({ error: 'Sessão não encontrada' }, 404);
+
+    // Generate a simple HTML PDF
+    const html = `<!DOCTYPE html>
+<html><head><meta charset="utf-8"><title>${session.title}</title>
+<style>body{font-family:sans-serif;max-width:800px;margin:40px auto;padding:0 20px;color:#333;}
+h1{color:#1a1a1e;border-bottom:2px solid #e0e0e0;padding-bottom:10px;}
+.meta{color:#666;font-size:14px;margin:20px 0;}
+.msg{margin:16px 0;padding:12px;border-radius:8px;}
+.user{background:#f0f0f5;}.assistant{background:#e8f0fe;}
+.role{font-weight:bold;font-size:13px;margin-bottom:4px;color:#555;}
+.content{line-height:1.6;white-space:pre-wrap;}
+.footer{margin-top:40px;padding-top:20px;border-top:1px solid #e0e0e0;font-size:12px;color:#999;text-align:center;}
+</style></head><body>
+<h1>${session.title}</h1>
+<div class="meta">${session.date || ''} · ${session.duration || ''}</div>
+${(session.messages || []).map(m => `
+<div class="msg ${m.role}">
+<div class="role">${m.role === 'user' ? 'Paciente' : 'Terapeuta'}</div>
+<div class="content">${m.content}</div>
+</div>`).join('')}
+${session.summary ? `<h2>Resumo</h2><p>${session.summary}</p>` : ''}
+<div class="footer">Relatório gerado por SIGMUND</div>
+</body></html>`;
+
+    return new Response(html, {
+      status: 200,
+      headers: { 'Content-Type': 'application/pdf', ...CORS_HEADERS },
+    });
+  }
+
+  return json({ error: 'Rota não encontrada' }, 404);
 }
 
 async function handleSessionCheck(request, env) {
