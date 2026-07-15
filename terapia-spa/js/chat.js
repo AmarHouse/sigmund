@@ -338,8 +338,8 @@ Quer continuar?`);
   _updateProgress(msgCount) {
     const el = document.getElementById('sessionProgress');
     if (!el) return;
-    const pct = Math.min(msgCount / 50 * 100, 100);
-    el.style.width = pct + '%';
+    const pct = Math.min(msgCount / 50, 1);
+    el.style.transform = 'scaleX(' + pct + ')';
   },
 
   _scrollToBottom() {

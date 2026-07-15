@@ -147,7 +147,7 @@
     setupTheme();
     setupSettings();
     setupEmergency();
-    setupExport();
+    setupSessoes();
     setupImport();
     setupHome();
     setupNewSession();
@@ -394,32 +394,33 @@
     });
   }
 
-  function setupExport() {
-    const navBtn = document.getElementById('exportNavBtn');
+  function setupSessoes() {
+    const navBtn = document.getElementById('sessoesNavBtn');
+    if (!navBtn) return;
 
     navBtn.addEventListener('click', () => {
       const session = SessionManager.current;
-      if (!session || session.messages.length === 0) {
-        showToast('Nenhuma conversa para salvar ainda');
-        return;
+      if (session && session.messages.length > 0) {
+        const data = SessionManager.exportCurrent();
+        if (data) {
+          const blob = new Blob([data], { type: 'application/octet-stream' });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = SessionManager.getExportFilename();
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          URL.revokeObjectURL(url);
+          showToast('Conversa salva com sucesso 💾');
+        }
       }
-
-      const data = SessionManager.exportCurrent();
-      if (!data) {
-        showToast('Nenhuma conversa para salvar ainda');
-        return;
+      const fileInput = document.getElementById('importFileInput');
+      if (fileInput && CryptoUtils.hasEmail()) {
+        fileInput.click();
+      } else if (fileInput && !CryptoUtils.hasEmail()) {
+        showToast('🔒 Importar conversas disponível no plano Premium');
       }
-
-      const blob = new Blob([data], { type: 'application/octet-stream' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = SessionManager.getExportFilename();
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-      showToast('Conversa salva com sucesso 💾');
     });
   }
 

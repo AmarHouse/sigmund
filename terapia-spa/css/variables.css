@@ -9,6 +9,7 @@
   --color-text-secondary: #706860;
   --color-text-tertiary: #9A948E;
   --color-accent: #D4953A;
+  --color-accent-text: #B87D2A;
   --color-accent-hover: #C4862E;
   --color-accent-light: #F3E9D6;
   --color-accent-soft: #FAF4EA;
@@ -73,6 +74,7 @@
   --color-text-secondary: #A8A49E;
   --color-text-tertiary: #8A8480;
   --color-accent: #E8B84A;
+  --color-accent-text: #D4A63E;
   --color-accent-hover: #D4A63E;
   --color-accent-light: #3A3020;
   --color-accent-soft: #2A2518;
