@@ -46,10 +46,12 @@ export async function onRequest(context) {
       }), { status: 200, headers: { 'Content-Type': 'application/json', ...CORS } });
     }
 
+    // Modelos gratuitos para testes (OpenRouter free route)
+    // Produção: deepseek/deepseek-v4-flash
     const OR_MODELS = [
-      env.PRIMARY_MODEL || 'deepseek/deepseek-v4-flash',
-      env.FALLBACK_MODEL || 'qwen/qwen-3.5-122b',
-      env.SECOND_FALLBACK_MODEL || 'zhipu/glm-5.2',
+      env.PRIMARY_MODEL || 'openrouter/free',
+      env.FALLBACK_MODEL || 'meta-llama/llama-3.3-70b-instruct:free',
+      env.SECOND_FALLBACK_MODEL || 'qwen/qwen3-next-80b-a3b-instruct:free',
     ];
 
     let lastError = null;

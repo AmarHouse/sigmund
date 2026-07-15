@@ -103,7 +103,7 @@
 
     if (isDev) {
       const savedProvider = UTILS.storage.get('provider', 'openrouter');
-      const savedModel = UTILS.storage.get('model', 'openai/gpt-4o-mini');
+      const savedModel = UTILS.storage.get('model', SIGMUND_MODEL);
       const savedApiKey = UTILS.storage.get('api_key', '');
       providerSelect.value = savedProvider;
       apiKeyInput.value = savedApiKey;

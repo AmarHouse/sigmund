@@ -1,3 +1,6 @@
+const SIGMUND_MODEL = 'openrouter/free'; // Always free on OpenRouter
+// Para producao: deepseek/deepseek-v4-flash
+
 const API = {
   async fetchModels(provider, apiKey) {
     const endpoints = {
@@ -29,7 +32,7 @@ const API = {
 
   async _request(messages, model, systemPrompt, extra = {}) {
     const body = {
-      model: model || 'deepseek/deepseek-v4-flash',
+      model: model || SIGMUND_MODEL,
       messages,
       temperature: 0.7,
       max_tokens: 2048,
