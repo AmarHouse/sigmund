@@ -1,13 +1,15 @@
 node_modules/
 browser-state-*.json
-*.png
-*.webp
 knowledge_base/
-!terapia-spa/icon.png
-!terapia-spa/user-avatar.png
-!terapia-spa/avatar.webp
-*.webp
 *.sgm
 *.pdf
 Sessão*
 test-sigmund.mjs
+
+# Images
+*.png
+*.webp
+!terapia-spa/icon.png
+!terapia-spa/user-avatar.png
+!terapia-spa/avatar.webp
+!terapia-spa/sigmund.webp
