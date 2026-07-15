@@ -240,7 +240,7 @@
         fileInput.click();
       } else {
         if (typeof SIGMUND_STRIPE !== 'undefined') SIGMUND_STRIPE.showPremiumPlans();
-        showToast('🔒 Importar disponível no plano Premium');
+        showToast('🔒 Retomar conversas disponível no plano Premium');
       }
     });
 
@@ -265,9 +265,9 @@
         Chat.loadSession(SessionManager.current.messages);
         Chat._hideWelcome();
         fileInput.value = '';
-        showToast(`Conversa restaurada — ${parsed.messages.length} mensagens 💬`);
+        showToast(`Conversa restaurada com sucesso 💬`);
       } catch (e) {
-        showToast('Erro ao importar: formato inválido');
+        showToast('Não foi possível restaurar a conversa. O arquivo pode estar danificado.');
       }
     });
 
@@ -294,13 +294,13 @@
     navBtn.addEventListener('click', () => {
       const session = SessionManager.current;
       if (!session || session.messages.length === 0) {
-        showToast('Nenhuma mensagem para exportar');
+        showToast('Nenhuma conversa para salvar ainda');
         return;
       }
 
       const data = SessionManager.exportCurrent();
       if (!data) {
-        showToast('Nada para exportar');
+        showToast('Nenhuma conversa para salvar ainda');
         return;
       }
 
@@ -313,7 +313,7 @@
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
-      showToast('Conversa salva 💾');
+      showToast('Conversa salva com sucesso 💾');
     });
   }
 
@@ -326,12 +326,12 @@
         e.preventDefault();
         const session = SessionManager.current;
         if (session && session.messages.length > 0) {
-          if (!confirm('Tem certeza? Iniciar uma nova sessão apagará toda a conversa atual.\n\nExporte a sessão antes se quiser preservá-la.')) return;
+          if (!confirm('Começar uma nova conversa apagará a atual. Se quiser salvá-la primeiro, clique em "Salvar" no menu inferior.')) return;
         }
         SessionManager.create();
         Chat.clear();
         updateSessionIndicator();
-        showToast('Nova sessão iniciada');
+        showToast('Nova conversa iniciada 🌱');
       });
     });
   }

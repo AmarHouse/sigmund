@@ -64,13 +64,13 @@ const Chat = {
             <button class="welcome-btn" id="welcomeImport">
               <span class="welcome-btn-icon">&#x1F4C2;</span>
               <span class="welcome-btn-label">Continuar de onde parei</span>
-              <span class="welcome-btn-desc">Importar conversa salva</span>
+              <span class="welcome-btn-desc">Retomar de onde parei</span>
             </button>
             ${hasLastSession ? `
             <button class="welcome-btn" id="welcomeRedownload">
               <span class="welcome-btn-icon">&#x1F4BE;</span>
-              <span class="welcome-btn-label">Recuperar última sessão</span>
-              <span class="welcome-btn-desc">Baixar .sgm salvo</span>
+              <span class="welcome-btn-label">Recuperar conversa</span>
+              <span class="welcome-btn-desc">Baixar minha última conversa</span>
             </button>` : ''}
           </div>
         </div>
@@ -129,8 +129,8 @@ const Chat = {
               <div class="lp-plan-price"><strong>R$ 49</strong><span>/mês</span></div>
               <ul>
                 <li>Sessões dia sim, dia não</li>
-                <li>Export da conversa automático</li>
-                <li>Proteção por PIN</li>
+                <li>Salvamento automático da conversa</li>
+                <li>Senha para proteger suas conversas</li>
               </ul>
               <button class="welcome-btn welcome-btn-primary" style="width:100%;">Assinar</button>
             </div>
@@ -205,9 +205,9 @@ const Chat = {
             a.href = url;
             a.download = SessionManager.getExportFilename() || 'sessao.sgm';
             a.click(); URL.revokeObjectURL(url);
-            showToast('Última sessão baixada');
+            showToast('Última conversa baixada 💾');
           } else {
-            showToast('Nenhuma sessão encontrada. Se usava PIN, digite-o nas configurações.');
+            showToast('Nenhuma conversa encontrada. Se usava senha, digite-a nas Configurações.');
           }
         });
       }
@@ -509,7 +509,7 @@ const Chat = {
     if (lastMsg) {
       const notice = document.createElement('div');
       notice.style.cssText = 'font-size:var(--font-size-xs);color:var(--color-text-tertiary);margin-top:var(--space-2);padding:var(--space-2);background:var(--color-accent-soft);border-radius:var(--radius-md);';
-      notice.innerHTML = '📁 Sua sessão foi salva automaticamente. Guarde o arquivo para continuar de onde paramos na próxima vez.';
+      notice.innerHTML = '💾 Sua conversa foi salva automaticamente. Guarde este arquivo com carinho — é ele que permite continuarmos de onde paramos na próxima vez.';
       lastMsg.appendChild(notice);
     }
   }

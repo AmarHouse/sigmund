@@ -7,11 +7,11 @@ const SIGMUND_STRIPE = {
       tag: 'Mais escolhido',
       tagline: 'Para o seu autocuidado',
       features: [
-        'Sessões dia sim, dia não',
-        'Até 50 mensagens por sessão',
-        'Modelo de IA de alta qualidade',
-        'Export .sgm automático',
-        'Proteção por PIN (opcional)',
+        'Converse dia sim, dia não — sem pressa',
+        'Cada conversa com até 50 trocas',
+        'Inteligência artificial treinada para acolher',
+        'Salvamento automático da sua história',
+        'Proteja com senha (opcional)',
         'Suporte por email',
       ]
     },
@@ -24,12 +24,12 @@ const SIGMUND_STRIPE = {
       priceLabel: 'R$ 97/mês',
       tagline: 'Para começar',
       features: [
-        'Até 30 pacientes ativos',
-        'Sessões ilimitadas por paciente',
-        'Marca personalizada (logo + cor)',
-        'Domínio próprio (seunome.sigmund.app)',
-        'Relatórios em PDF',
-        'Transcrição por email',
+        'Até 30 pacientes cadastrados',
+        'Sessões ilimitadas para cada um',
+        'Sua marca (logo, cores, endereço próprio)',
+        'Relatórios em PDF após cada sessão',
+        'Resumo enviado por email',
+        'Privacidade total dos dados',
       ]
     },
     wl_pro: {
@@ -39,14 +39,14 @@ const SIGMUND_STRIPE = {
       tag: 'Recomendado',
       tagline: 'Para crescer',
       features: [
-        'Até 60 pacientes ativos',
-        'Sessões ilimitadas por paciente',
-        'Marca personalizada (logo + cor)',
-        'Domínio próprio',
-        'Relatórios em PDF',
-        'Transcrição por email',
-        'Suporte prioritário',
-        'Painel do psicólogo completo',
+        'Até 60 pacientes cadastrados',
+        'Sessões ilimitadas para cada um',
+        'Sua marca (logo, cores, endereço próprio)',
+        'Relatórios em PDF automáticos',
+        'Resumo enviado por email',
+        'Suporte prioritário por WhatsApp',
+        'Painel completo com histórico dos pacientes',
+        'Ideal para clínicas e grupos',
       ]
     },
   },
@@ -161,10 +161,10 @@ const SIGMUND_STRIPE = {
         border-radius:var(--radius-sm);
       " onmouseover="this.style.background='var(--color-accent-soft)'" onmouseout="this.style.background='none'">✕</button>
       <div style="margin-bottom:var(--space-5);">
-        <h2 style="margin:0;font-size:var(--font-size-lg);">Tudo começa com uma conversa</h2>
+        <h2 style="margin:0;font-size:var(--font-size-lg);">Cuidar de você faz bem</h2>
         <p style="margin:var(--space-1) 0 0;font-size:var(--font-size-sm);color:var(--color-text-secondary);line-height:var(--line-height-relaxed);">
-          Sua primeira sessão é gratuita. Depois, por <strong>R$ 49/mês</strong>, você tem sessões 
-          regulares com SIGMUND — um espaço seu para se ouvir e se entender melhor, sem julgamentos.
+          A primeira conversa é por minha conta. Depois, por <strong>R$ 49/mês</strong>, você tem 
+          encontros regulares com SIGMUND — um espaço seu, sem julgamentos, sempre que precisar.
         </p>
       </div>
       <div data-plan-section="user">
@@ -176,7 +176,7 @@ const SIGMUND_STRIPE = {
           padding:var(--space-3);cursor:pointer;font-size:var(--font-size-sm);color:var(--color-text-secondary);
           transition:all 0.2s;
         " onmouseover="this.style.borderColor='var(--color-accent)'" onmouseout="this.style.borderColor='var(--color-border)'">
-          Continuar grátis
+          Quero só a conversa grátis
         </button>
       </div>
     `);
@@ -196,9 +196,8 @@ const SIGMUND_STRIPE = {
       <div style="margin-bottom:var(--space-5);">
         <h2 style="margin:0;font-size:var(--font-size-lg);">Para psicólogos — White Label</h2>
         <p style="margin:var(--space-1) 0 0;font-size:var(--font-size-sm);color:var(--color-text-secondary);line-height:var(--line-height-relaxed);">
-          Sua própria plataforma de terapia com IA. Personalize com sua marca, cadastre seus pacientes 
-          e receba relatórios completos de cada sessão por email. Tudo que você precisa para expandir 
-          seu atendimento.
+          Sua clínica com IA. Cadastre seus pacientes, eles conversam com o SIGMUND, e você recebe 
+          um relatório completo de cada sessão no seu email. Tudo com a sua marca, do seu jeito.
         </p>
       </div>
       <div data-plan-section="wl" style="display:flex;flex-direction:column;gap:var(--space-3);">

@@ -23,7 +23,7 @@ const Onboarding = {
         <h2 style="margin:0 0 var(--space-2);font-size:var(--font-size-lg);">Gostou da sua primeira sessão?</h2>
         <p style="color:var(--color-text-secondary);font-size:var(--font-size-sm);margin-bottom:var(--space-5);line-height:var(--line-height-relaxed);">
           Que bom que você experimentou! Para continuar seu acompanhamento, crie sua conta e escolha um plano.<br><br>
-          Sua sessão de hoje já foi salva no arquivo .sgm que você baixou. Com a conta, você pode importá-la e continuar de onde parou.
+          Sua conversa de hoje foi salva automaticamente no seu computador. Com a conta, você pode retomá-la de onde parou quando quiser.
         </p>
         <div style="display:flex;flex-direction:column;gap:var(--space-2);">
           <button id="onboardingSignup" style="width:100%;padding:var(--space-3);background:var(--color-accent);color:white;border:none;border-radius:var(--radius-md);font-size:var(--font-size-md);font-weight:var(--font-weight-semibold);cursor:pointer;transition:opacity var(--transition-fast);"
