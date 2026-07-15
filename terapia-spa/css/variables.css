@@ -1,4 +1,6 @@
 :root {
+  /* Decisão intencional de marca: fundo cream quente (#F7F5F0) para transmitir acolhimento.
+     Consciente do risco de 'AI default', mantido por ser apropriado ao contexto terapêutico. */
   --color-bg: #F7F5F0;
   --color-bg-soft: #EFEDE8;
   --color-surface: #FFFFFF;
@@ -7,7 +9,7 @@
   --color-border-light: #F0EDE8;
   --color-text: #2C2C2C;
   --color-text-secondary: #6B6B6B;
-  --color-text-tertiary: #9A9A9A;
+  --color-text-tertiary: #7A7A7A;
   --color-accent: #7BA89A;
   --color-accent-hover: #6B9A8C;
   --color-accent-light: #E8F2EF;
@@ -71,7 +73,7 @@
   --color-border-light: #323236;
   --color-text: #E8E4DE;
   --color-text-secondary: #A8A4A0;
-  --color-text-tertiary: #7A7878;
+  --color-text-tertiary: #9C9A9A;
   --color-accent: #7BA89A;
   --color-accent-hover: #8DB8AA;
   --color-accent-light: #2A3A34;
@@ -97,7 +99,7 @@
     --color-border-light: #323236;
     --color-text: #E8E4DE;
     --color-text-secondary: #A8A4A0;
-    --color-text-tertiary: #7A7878;
+  --color-text-tertiary: #9C9A9A;
     --color-accent: #7BA89A;
     --color-accent-hover: #8DB8AA;
     --color-accent-light: #2A3A34;

@@ -1,6 +1,63 @@
 (function() {
   'use strict';
 
+  let activeFocusTrap = null;
+
+  function trapFocus(element) {
+    const focusable = element.querySelectorAll(
+      'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+    );
+    if (focusable.length === 0) return;
+    const first = focusable[0];
+    const last = focusable[focusable.length - 1];
+    first.focus();
+
+    function handler(e) {
+      if (e.key !== 'Tab') return;
+      if (e.shiftKey) {
+        if (document.activeElement === first) { e.preventDefault(); last.focus(); }
+      } else {
+        if (document.activeElement === last) { e.preventDefault(); first.focus(); }
+      }
+    }
+    element.addEventListener('keydown', handler);
+    activeFocusTrap = () => { element.removeEventListener('keydown', handler); };
+  }
+
+  function releaseFocusTrap() {
+    if (activeFocusTrap) { activeFocusTrap(); activeFocusTrap = null; }
+  }
+
+  function showConfirm(message, confirmLabel, cancelLabel) {
+    return new Promise(resolve => {
+      const overlay = document.createElement('div');
+      overlay.className = 'settings-modal-overlay';
+      overlay.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;z-index:300;padding:var(--space-5);animation:fadeIn 0.2s ease;';
+      overlay.innerHTML = `
+        <div style="background:var(--color-surface);border-radius:var(--radius-xl);max-width:400px;width:100%;padding:var(--space-8);box-shadow:var(--shadow-xl);text-align:center;">
+          <div style="font-size:32px;margin-bottom:var(--space-3);">🌱</div>
+          <p style="font-size:var(--font-size-base);color:var(--color-text);line-height:var(--line-height-relaxed);margin-bottom:var(--space-6);">${message}</p>
+          <div style="display:flex;gap:var(--space-3);">
+            <button class="confirm-cancel" style="flex:1;padding:var(--space-3);background:var(--color-bg-soft);border:none;border-radius:var(--radius-md);font-size:var(--font-size-sm);font-weight:var(--font-weight-medium);color:var(--color-text-secondary);cursor:pointer;">${cancelLabel || 'Cancelar'}</button>
+            <button class="confirm-ok" style="flex:1;padding:var(--space-3);background:var(--color-accent);border:none;border-radius:var(--radius-md);font-size:var(--font-size-sm);font-weight:var(--font-weight-semibold);color:white;cursor:pointer;">${confirmLabel || 'Confirmar'}</button>
+          </div>
+        </div>
+      `;
+      document.body.appendChild(overlay);
+      trapFocus(overlay);
+
+      overlay.querySelector('.confirm-cancel').addEventListener('click', () => {
+        releaseFocusTrap(); overlay.remove(); resolve(false);
+      });
+      overlay.querySelector('.confirm-ok').addEventListener('click', () => {
+        releaseFocusTrap(); overlay.remove(); resolve(true);
+      });
+      overlay.addEventListener('click', e => {
+        if (e.target === overlay) { releaseFocusTrap(); overlay.remove(); resolve(false); }
+      });
+    });
+  }
+
   async function init() {
     // Register Service Worker for PWA
     if ('serviceWorker' in navigator) {
@@ -32,7 +89,7 @@
     document.addEventListener('touchstart', e => { touchStartY = e.touches[0].clientY; }, { passive: true });
     document.addEventListener('touchend', e => {
       const diff = e.changedTouches[0].clientY - touchStartY;
-      if (diff > 80) {
+      if (diff > 150) {
         document.querySelectorAll('.modal-hidden, #plansOverlay, #gsiOverlay, #onboardingOverlay').forEach(el => {
           if (el.style.display !== 'none' && !el.classList.contains('modal-hidden')) {
             el.style.display = 'none';
@@ -65,20 +122,25 @@
       UTILS.storage.set('theme', 'dark');
     }
 
-    // Show onboarding after 1st session (when session has messages and no account)
-    setTimeout(() => {
-      if (session && session.messages.length >= 3 && !CryptoUtils.hasEmail()) {
-        Onboarding.showAfterFreeSession();
-      }
-    }, 2000);
+    // Show onboarding 60s after session starts (set by chat.js when first message is sent)
+    window._startOnboardingTimer = () => {
+      setTimeout(() => {
+        if (!CryptoUtils.hasEmail()) {
+          Onboarding.showAfterFreeSession();
+        }
+      }, 60000);
+    };
 
-    // Check-in between sessions
-    setTimeout(() => {
-      const lastSession = UTILS.storage.get('last_session', null);
-      if (lastSession && !CryptoUtils.hasEmail()) {
-        Onboarding.showCheckIn();
+    // Check-in between sessions (only on return visit, not right after)
+    const lastSession = UTILS.storage.get('last_session', null);
+    if (lastSession && !CryptoUtils.hasEmail()) {
+      const isReturnVisit = session && session.messages.length === 0;
+      if (isReturnVisit) {
+        setTimeout(() => {
+          Onboarding.showCheckIn();
+        }, 3000);
       }
-    }, 3000);
+    }
   }
 
   function setupUI() {
@@ -234,12 +296,13 @@
     btn.addEventListener('click', () => {
       modal.classList.remove('modal-hidden');
       if (status) status.style.display = 'none';
+      setTimeout(() => trapFocus(modal), 100);
     });
 
-    close.addEventListener('click', () => closeModal(modal));
+    close.addEventListener('click', () => { releaseFocusTrap(); closeModal(modal); });
 
     modal.addEventListener('click', (e) => {
-      if (e.target === modal) closeModal(modal);
+      if (e.target === modal) { releaseFocusTrap(); closeModal(modal); }
     });
   }
 
@@ -249,10 +312,13 @@
     const modal = document.getElementById('emergencyModal');
     const close = document.getElementById('emergencyModalClose');
 
-    const show = () => modal.classList.remove('modal-hidden');
+    const show = () => {
+      modal.classList.remove('modal-hidden');
+      setTimeout(() => trapFocus(modal), 100);
+    };
 
     if (fabBtn) fabBtn.addEventListener('click', show);
-    const hide = () => modal.classList.add('modal-hidden');
+    const hide = () => { releaseFocusTrap(); modal.classList.add('modal-hidden'); };
 
     quickBtn.addEventListener('click', show);
     close.addEventListener('click', hide);
@@ -305,7 +371,11 @@
         fileInput.value = '';
         showToast(`Conversa restaurada com sucesso 💬`);
       } catch (e) {
-        showToast('Não foi possível restaurar a conversa. O arquivo pode estar danificado.');
+        if (e instanceof TypeError && e.message === 'Failed to fetch') {
+          showToast('Sem conexão com a internet. Verifique sua rede.');
+        } else {
+          showToast('Não foi possível restaurar a conversa. O arquivo pode estar danificado.');
+        }
       }
     });
 
@@ -360,11 +430,16 @@
 
     btns.forEach(btn => {
       if (!btn) return;
-      btn.addEventListener('click', (e) => {
+      btn.addEventListener('click', async (e) => {
         e.preventDefault();
         const session = SessionManager.current;
         if (session && session.messages.length > 0) {
-          if (!confirm('Começar uma nova conversa apagará a atual. Se quiser salvá-la primeiro, clique em "Salvar" no menu inferior.')) return;
+          const ok = await showConfirm(
+            'Começar uma nova conversa apagará a atual. Se quiser salvá-la, clique em <strong>Salvar</strong> no menu inferior antes.',
+            'Nova conversa',
+            'Cancelar'
+          );
+          if (!ok) return;
         }
         SessionManager.create();
         Chat.clear();
@@ -481,7 +556,13 @@
         showToast('Erro ao entrar: ' + (data.error || 'desconhecido'));
       }
     } catch (e) {
-      showToast('Erro de conexão ao autenticar');
+      if (e instanceof TypeError && e.message === 'Failed to fetch') {
+        showToast('Sem conexão com a internet. Verifique sua rede.');
+      } else if (e.name === 'SyntaxError') {
+        showToast('Erro no servidor. Tente novamente em instantes.');
+      } else {
+        showToast('Erro de conexão ao autenticar');
+      }
     }
   }
 

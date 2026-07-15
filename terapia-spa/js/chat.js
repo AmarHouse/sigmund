@@ -22,6 +22,9 @@ const Chat = {
           : 'Olá! Eu sou o SIGMUND, mas pode me chamar de Sig. Que bom que você está aqui.\n\nPara começarmos, me conte como prefere ser chamado(a) e o que te trouxe até aqui.';
         SessionManager.addMessage('assistant', greeting);
         this._addMessage('assistant', greeting);
+        if (!hasAccount && typeof window._startOnboardingTimer === 'function') {
+          window._startOnboardingTimer();
+        }
       });
     }
 
@@ -38,181 +41,53 @@ const Chat = {
   },
 
   _renderWelcome() {
-    let el = document.getElementById('welcomeScreen');
-    if (el) { el.style.display = 'flex'; return; }
-    const container = document.getElementById('chatMessages');
-    if (!container) return;
-    const firstNumber = SessionManager.current?.number || '';
+    const el = document.getElementById('welcomeScreen');
+    if (el) {
+      el.style.display = 'flex';
+      this._setupPlanButtons();
+      this._setupRedownload();
+      return;
+    }
+  },
+
+  _setupPlanButtons() {
+    document.getElementById('welcomePremiumCTA')?.addEventListener('click', () => {
+      if (typeof SIGMUND_STRIPE !== 'undefined') SIGMUND_STRIPE.showPremiumPlans();
+    });
+    document.getElementById('welcomeWLCTA')?.addEventListener('click', () => {
+      if (typeof SIGMUND_STRIPE !== 'undefined') SIGMUND_STRIPE.showWLPlans();
+    });
+  },
+
+  _setupRedownload() {
     const hasLastSession = !!UTILS.storage.get('last_session', null) || !!UTILS.storage.get('last_session_encrypted', null);
-    const email = CryptoUtils.getEmail();
-    const hasAccount = !!email;
-
-    container.insertAdjacentHTML('afterbegin', `
-      <div class="chat-welcome" id="welcomeScreen">
-        <div class="lp-hero">
-          <img class="lp-icon" src="icon.png" alt="SIGMUND">
-          <h1 class="lp-title">SIGMUND</h1>
-          <p class="lp-subtitle">Terapia com IA, disponível 24h</p>
-          <p class="lp-description">Um espaço seguro para se ouvir e se entender, sem julgamentos.<br>Converse no seu tempo, no seu ritmo.</p>
-
-          <div class="lp-ctas">
-            <button class="welcome-btn welcome-btn-primary" id="welcomeFirstSession">
-              <span class="welcome-btn-icon">&#x1F331;</span>
-            <span class="welcome-btn-label">Conversar agora</span>
-            <span class="welcome-btn-desc">Grátis para começar</span>
-            </button>
-            <button class="welcome-btn" id="welcomeImport">
-              <span class="welcome-btn-icon">&#x1F4C2;</span>
-              <span class="welcome-btn-label">Continuar de onde parei</span>
-              <span class="welcome-btn-desc">Retomar de onde parei</span>
-            </button>
-            ${hasLastSession ? `
-            <button class="welcome-btn" id="welcomeRedownload">
-              <span class="welcome-btn-icon">&#x1F4BE;</span>
-              <span class="welcome-btn-label">Recuperar conversa</span>
-              <span class="welcome-btn-desc">Baixar minha última conversa</span>
-            </button>` : ''}
-          </div>
-        </div>
-
-        <div class="lp-benefits">
-          <div class="lp-benefit-item">
-            <div class="lp-benefit-icon">&#x1F30D;</div>
-            <strong>Disponível 24h</strong>
-            <span>Quando você precisar, ele está aqui</span>
-          </div>
-          <div class="lp-benefit-item">
-            <div class="lp-benefit-icon">&#x1F512;</div>
-            <strong>100% privado</strong>
-            <span>Seus dados ficam só no seu navegador</span>
-          </div>
-          <div class="lp-benefit-item">
-            <div class="lp-benefit-icon">&#x1F9EC;</div>
-            <strong>Anamnese completa</strong>
-            <span>Ele pergunta, entende e lembra</span>
-          </div>
-          <div class="lp-benefit-item">
-            <div class="lp-benefit-icon">&#x1F4AD;</div>
-            <strong>Evolui com você</strong>
-            <span>Sessões conectadas, não isoladas</span>
-          </div>
-        </div>
-
-        <div class="lp-section">
-          <h2 class="lp-section-title">Como funciona</h2>
-          <div class="lp-steps">
-            <div class="lp-step">
-              <span class="lp-step-num">1</span>
-              <strong>Converse</strong>
-              <span>Fale sobre o que estiver sentindo</span>
-            </div>
-            <div class="lp-step">
-              <span class="lp-step-num">2</span>
-              <strong>Compreenda</strong>
-              <span>Ele pergunta para te ajudar a se entender</span>
-            </div>
-            <div class="lp-step">
-              <span class="lp-step-num">3</span>
-              <strong>Evolua</strong>
-              <span>A cada sessão, retoma de onde parou</span>
-            </div>
-          </div>
-        </div>
-
-        <div class="lp-section">
-          <h2 class="lp-section-title">Planos</h2>
-          <div class="lp-plans">
-            <div class="lp-plan-card" id="welcomePremiumCTA">
-              <div class="lp-plan-tag">Mais escolhido</div>
-              <h3>Premium</h3>
-              <p>Para o seu autocuidado</p>
-              <div class="lp-plan-price"><strong>R$ 49</strong><span>/mês</span></div>
-              <ul>
-                <li>2 sessões por semana</li>
-                <li>Salvamento automático da conversa</li>
-                <li>Senha para proteger suas conversas</li>
-              </ul>
-              <button class="welcome-btn welcome-btn-primary" style="width:100%;">Assinar</button>
-            </div>
-            <div class="lp-plan-card lp-plan-card-wl" id="welcomeWLCTA">
-              <h3>White Label</h3>
-              <p>Para psicólogos</p>
-              <div class="lp-plan-price"><strong>R$ 97</strong><span>/mês</span></div>
-              <ul>
-                <li>Até 30 pacientes</li>
-                <li>Sua marca (logo + domínio)</li>
-                <li>Relatórios em PDF</li>
-              </ul>
-              <button class="welcome-btn" style="width:100%;">Saiba mais</button>
-            </div>
-          </div>
-          ${!hasAccount ? `<p class="lp-free-note">Grátis para começar. <a href="#" id="welcomeSeePlans" style="color:var(--color-accent);text-decoration:underline;">Veja todos os detalhes</a>.</p>` : ''}
-        </div>
-
-        <div class="lp-section lp-section-wl" id="welcomeWLSection" style="display:none;">
-          <h2 class="lp-section-title">Sua clínica com IA</h2>
-          <p>A plataforma que expande seu atendimento com tecnologia que seus pacientes já aceitam.</p>
-          <div class="lp-benefits">
-            <div class="lp-benefit-item">
-              <div class="lp-benefit-icon">&#x1F5E8;</div>
-              <strong>Seus pacientes</strong>
-              <span>Eles conversam, você recebe relatórios</span>
-            </div>
-            <div class="lp-benefit-item">
-              <div class="lp-benefit-icon">&#x1F4CB;</div>
-              <strong>Relatórios automáticos</strong>
-              <span>Cada sessão vira um PDF enviado por email</span>
-            </div>
-            <div class="lp-benefit-item">
-              <div class="lp-benefit-icon">&#x1F3F7;</div>
-              <strong>Sua marca</strong>
-              <span>Logo, cores, domínio próprio</span>
-            </div>
-          </div>
-        </div>
-
-        <div class="lp-footer">
-          SIGMUND — terapia com IA &copy; ${new Date().getFullYear()}
-        </div>
-      </div>`);
-
-    // Event handlers
-    setTimeout(() => {
-      document.getElementById('welcomeSeePlans')?.addEventListener('click', (e) => {
-        e.preventDefault();
-        if (typeof SIGMUND_STRIPE !== 'undefined') SIGMUND_STRIPE.showPremiumPlans();
-      });
-      document.getElementById('welcomePremiumCTA')?.addEventListener('click', () => {
-        if (typeof SIGMUND_STRIPE !== 'undefined') SIGMUND_STRIPE.showPremiumPlans();
-      });
-      document.getElementById('welcomeWLCTA')?.addEventListener('click', () => {
-        if (typeof SIGMUND_STRIPE !== 'undefined') SIGMUND_STRIPE.showWLPlans();
-      });
-
-      const redl = document.getElementById('welcomeRedownload');
-      if (redl) {
-        redl.addEventListener('click', async () => {
-          let content = null;
-          const encrypted = UTILS.storage.get('last_session_encrypted', null);
-          const raw = UTILS.storage.get('last_session', null);
-          if (encrypted && CryptoUtils.hasPin()) {
-            content = await CryptoUtils.decrypt(encrypted, CryptoUtils.getPin());
-          } else if (raw) { content = raw; }
-          if (content) {
-            const blob = new Blob([content], { type: 'application/octet-stream' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = SessionManager.getExportFilename() || 'sessao.sgm';
-            a.click(); URL.revokeObjectURL(url);
-            showToast('Última conversa baixada 💾');
-          } else {
-            showToast('Nenhuma conversa encontrada. Se usava senha, digite-a nas Configurações.');
-          }
-        });
+    if (!hasLastSession) return;
+    const container = document.querySelector('.lp-ctas');
+    if (!container || document.getElementById('welcomeRedownload')) return;
+    const btn = document.createElement('button');
+    btn.className = 'welcome-btn';
+    btn.id = 'welcomeRedownload';
+    btn.innerHTML = '<span class="welcome-btn-icon">&#x1F4BE;</span><span class="welcome-btn-label">Recuperar conversa</span><span class="welcome-btn-desc">Baixar minha última conversa</span>';
+    container.appendChild(btn);
+    btn.addEventListener('click', async () => {
+      let content = null;
+      const encrypted = UTILS.storage.get('last_session_encrypted', null);
+      const raw = UTILS.storage.get('last_session', null);
+      if (encrypted && CryptoUtils.hasPin()) {
+        content = await CryptoUtils.decrypt(encrypted, CryptoUtils.getPin());
+      } else if (raw) { content = raw; }
+      if (content) {
+        const blob = new Blob([content], { type: 'application/octet-stream' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = SessionManager.getExportFilename() || 'sessao.sgm';
+        a.click(); URL.revokeObjectURL(url);
+        showToast('Última conversa baixada 💾');
+      } else {
+        showToast('Nenhuma conversa encontrada. Se usava senha, digite-a nas Configurações.');
       }
-    }, 0);
-    this._setupWelcomeButtons();
+    });
   },
 
   _hideWelcome() {

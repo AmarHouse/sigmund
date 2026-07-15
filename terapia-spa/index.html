@@ -120,22 +120,76 @@
 
     <main class="main-area">
       <div class="chat-container" id="chatContainer">
-        <div class="chat-messages" id="chatMessages">
+        <div class="chat-messages" id="chatMessages" role="log" aria-live="polite" aria-label="Mensagens da conversa">
           <div class="chat-welcome" id="welcomeScreen">
-            <img class="chat-welcome-icon-img" src="icon.png" alt="SIGMUND">
-            <h1>SIGMUND</h1>
-            <p>Bem-vindo ao seu espaço de conversa. Aqui você pode falar sobre o que estiver sentindo, de forma livre e sem julgamentos.</p>
-            <div class="welcome-actions">
-              <button class="welcome-btn welcome-btn-primary" id="welcomeFirstSession">
-                <span class="welcome-btn-icon">&#x1F331;</span>
-                <span class="welcome-btn-label">Primeira sessão</span>
-                <span class="welcome-btn-desc">Começar do zero</span>
-              </button>
-              <button class="welcome-btn" id="welcomeImport">
-                <span class="welcome-btn-icon">&#x1F4C2;</span>
-                <span class="welcome-btn-label">Continuar sessão</span>
-                <span class="welcome-btn-desc">Importar arquivo .sgm</span>
-              </button>
+            <div class="lp-hero">
+              <img class="lp-icon" src="icon.png" alt="SIGMUND">
+              <h1 class="lp-title">SIGMUND</h1>
+              <p class="lp-subtitle">Terapia com IA, disponível 24h</p>
+              <p class="lp-description">Um espaço seguro para se ouvir e se entender, sem julgamentos.<br>Converse no seu tempo, no seu ritmo.</p>
+              <div class="lp-ctas">
+                <button class="welcome-btn welcome-btn-primary" id="welcomeFirstSession">
+                  <span class="welcome-btn-icon">&#x1F331;</span>
+                  <span class="welcome-btn-label">Conversar agora</span>
+                  <span class="welcome-btn-desc">Grátis para começar</span>
+                </button>
+                <button class="welcome-btn" id="welcomeImport">
+                  <span class="welcome-btn-icon">&#x1F4C2;</span>
+                  <span class="welcome-btn-label">Continuar de onde parei</span>
+                  <span class="welcome-btn-desc">Retomar conversa salva</span>
+                </button>
+              </div>
+            </div>
+            <div class="lp-benefits">
+              <div class="lp-benefit-item">
+                <div class="lp-benefit-icon">&#x1F30D;</div>
+                <strong>Disponível 24h</strong>
+                <span>Quando você precisar, ele está aqui</span>
+              </div>
+              <div class="lp-benefit-item">
+                <div class="lp-benefit-icon">&#x1F512;</div>
+                <strong>100% privado</strong>
+                <span>Seus dados ficam só no seu navegador</span>
+              </div>
+              <div class="lp-benefit-item">
+                <div class="lp-benefit-icon">&#x1F9EC;</div>
+                <strong>Anamnese completa</strong>
+                <span>Ele pergunta, entende e lembra</span>
+              </div>
+              <div class="lp-benefit-item">
+                <div class="lp-benefit-icon">&#x1F4AD;</div>
+                <strong>Evolui com você</strong>
+                <span>Sessões conectadas, não isoladas</span>
+              </div>
+            </div>
+            <div class="lp-section" id="welcomePlansSection">
+              <h2 class="lp-section-title">Planos</h2>
+              <div class="lp-plans">
+                <div class="lp-plan-card" id="welcomePremiumCTA">
+                  <div class="lp-plan-tag">Mais escolhido</div>
+                  <h3>Premium</h3>
+                  <p>Para o seu autocuidado</p>
+                  <div class="lp-plan-price"><strong>R$ 49</strong><span>/mês</span></div>
+                  <ul>
+                    <li>2 sessões por semana</li>
+                    <li>Salvamento automático da conversa</li>
+                    <li>Senha para proteger suas conversas</li>
+                  </ul>
+                  <button class="welcome-btn welcome-btn-primary" style="width:100%;">Assinar</button>
+                </div>
+                <div class="lp-plan-card lp-plan-card-wl" id="welcomeWLCTA">
+                  <h3>White Label</h3>
+                  <p>Para psicólogos</p>
+                  <div class="lp-plan-price"><strong>R$ 97</strong><span>/mês</span></div>
+                  <ul>
+                    <li>Até 30 pacientes</li>
+                    <li>Sua marca (logo + domínio)</li>
+                    <li>Relatórios em PDF</li>
+                  </ul>
+                  <button class="welcome-btn" style="width:100%;">Saiba mais</button>
+                </div>
+              </div>
+              <p class="lp-free-note">Grátis para começar.</p>
             </div>
           </div>
         </div>
@@ -156,38 +210,38 @@
       </div>
     </main>
 
-    <nav class="app-nav" role="tablist">
-      <button class="nav-item active" id="navChatBtn">
+    <nav class="app-nav" role="tablist" aria-label="Navegação principal">
+      <button class="nav-item active" id="navChatBtn" role="tab" aria-selected="true" tabindex="0">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
         </svg>
         <span>Conversar</span>
       </button>
-      <button class="nav-item" id="navPremiumBtn">
+      <button class="nav-item" id="navPremiumBtn" role="tab" aria-selected="false" tabindex="-1">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
         </svg>
         <span>Planos</span>
       </button>
-      <button class="nav-item" id="navWLBtn">
+      <button class="nav-item" id="navWLBtn" role="tab" aria-selected="false" tabindex="-1">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
         </svg>
         <span>Profissionais</span>
       </button>
-      <button class="nav-item" id="exportNavBtn">
+      <button class="nav-item" id="exportNavBtn" role="tab" aria-selected="false" tabindex="-1">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="10 12 14 12"/><line x1="12" y1="10" x2="12" y2="14"/>
         </svg>
         <span>Salvar</span>
       </button>
-      <button class="nav-item" id="dashboardNavBtn" style="display:none;">
+      <button class="nav-item" id="dashboardNavBtn" role="tab" aria-selected="false" tabindex="-1" style="display:none;">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/>
         </svg>
         <span>Pacientes</span>
       </button>
-      <button class="nav-item" id="importNavBtn">
+      <button class="nav-item" id="importNavBtn" role="tab" aria-selected="false" tabindex="-1">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="10 12 14 12"/><line x1="12" y1="10" x2="12" y2="14"/><polyline points="17 8 12 3 7 8"/>
         </svg>
