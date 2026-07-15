@@ -180,6 +180,15 @@ const SessionManager = {
     return lines.join('\n');
   },
 
+  saveLastSession() {
+    const data = this.exportCurrent();
+    if (data) UTILS.storage.set('last_session', data);
+  },
+
+  getLastSession() {
+    return UTILS.storage.get('last_session', '');
+  },
+
   _getDuration(session) {
     if (session.messages.length < 2) return '—';
     const start = new Date(session.messages[0].timestamp);

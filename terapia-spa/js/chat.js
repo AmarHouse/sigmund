@@ -38,6 +38,8 @@ const Chat = {
     const container = document.getElementById('chatMessages');
     if (!container) return;
     const firstNumber = SessionManager.current?.number || '';
+    const hasLastSession = !!UTILS.storage.get('last_session', null) || !!UTILS.storage.get('last_session_encrypted', null);
+
     container.insertAdjacentHTML('afterbegin', `
       <div class="chat-welcome" id="welcomeScreen">
         <img class="chat-welcome-icon-img" src="icon.png" alt="SIGMUND">
@@ -55,8 +57,43 @@ const Chat = {
             <span class="welcome-btn-label">Continuar sessão</span>
             <span class="welcome-btn-desc">Importar arquivo .sgm</span>
           </button>
+          ${hasLastSession ? `
+          <button class="welcome-btn" id="welcomeRedownload">
+            <span class="welcome-btn-icon">&#x1F4BE;</span>
+            <span class="welcome-btn-label">Recuperar última sessão</span>
+            <span class="welcome-btn-desc">Baixar .sgm salvo</span>
+          </button>` : ''}
         </div>
       </div>`);
+
+    // Add re-download handler
+    setTimeout(() => {
+      const redl = document.getElementById('welcomeRedownload');
+      if (redl) {
+        redl.addEventListener('click', async () => {
+          let content = null;
+          const encrypted = UTILS.storage.get('last_session_encrypted', null);
+          const raw = UTILS.storage.get('last_session', null);
+          if (encrypted && CryptoUtils.hasPin()) {
+            content = await CryptoUtils.decrypt(encrypted, CryptoUtils.getPin());
+          } else if (raw) {
+            content = raw;
+          }
+          if (content) {
+            const blob = new Blob([content], { type: 'application/octet-stream' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = SessionManager.getExportFilename() || 'sessao.sgm';
+            a.click();
+            URL.revokeObjectURL(url);
+            showToast('Última sessão baixada');
+          } else {
+            showToast('Nenhuma sessão encontrada. Se usava PIN, digite-o nas configurações.');
+          }
+        });
+      }
+    }, 0);
     this._setupWelcomeButtons();
   },
 
@@ -139,6 +176,14 @@ const Chat = {
       const role = 'assistant';
       SessionManager.addMessage(role, cleanResponse, route.kbIds);
       this._addMessage(role, cleanResponse);
+
+      // Auto-export at the end of session
+      const msgCount = SessionManager.current?.messages?.length || 0;
+      const firstUserIdx = SessionManager.current?.messages?.findIndex(m => m.role === 'user' && !m.imported) || 0;
+      const sessionMsgCount = msgCount - firstUserIdx;
+      if (sessionMsgCount >= 48 && sessionMsgCount % 2 === 0) {
+        this._autoExport();
+      }
 
     } catch (err) {
       this._removeTypingIndicator(msgEl);
@@ -240,6 +285,46 @@ const Chat = {
       if (msg.role === 'user' || msg.role === 'assistant') {
         this._addMessage(msg.role, msg.content);
       }
+    }
+  },
+
+  _autoExport() {
+    const data = SessionManager.exportCurrent();
+    if (!data) return;
+
+    // Try to encrypt with PIN
+    const finishExport = (content) => {
+      const blob = new Blob([content], { type: 'application/octet-stream' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = SessionManager.getExportFilename();
+      a.click();
+      URL.revokeObjectURL(url);
+
+      // Store in localStorage for re-download (encrypted if PIN is set)
+      const storeData = async () => {
+        if (CryptoUtils.hasPin()) {
+          const encrypted = await CryptoUtils.encrypt(content, CryptoUtils.getPin());
+          UTILS.storage.set('last_session_encrypted', encrypted);
+          UTILS.storage.set('last_session_has_pin', 'true');
+        } else {
+          UTILS.storage.set('last_session_raw', content);
+          UTILS.storage.remove('last_session_has_pin');
+        }
+      };
+      storeData();
+    };
+
+    finishExport(data);
+
+    // Show message in chat
+    const lastMsg = document.querySelector('.message:last-child .message-body');
+    if (lastMsg) {
+      const notice = document.createElement('div');
+      notice.style.cssText = 'font-size:var(--font-size-xs);color:var(--color-text-tertiary);margin-top:var(--space-2);padding:var(--space-2);background:var(--color-accent-soft);border-radius:var(--radius-md);';
+      notice.innerHTML = '📁 Sua sessão foi salva automaticamente. Guarde o arquivo para continuar de onde paramos na próxima vez.';
+      lastMsg.appendChild(notice);
     }
   }
 };
