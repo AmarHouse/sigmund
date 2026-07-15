@@ -96,14 +96,23 @@ const API = {
     return data;
   },
 
-  async call(messages, kbContext, kbIds, intent, currentNotes, currentSummary, isFirstSession) {
-    const systemPrompt = Prompts.getSystemPrompt(intent, kbContext, kbIds, currentNotes, currentSummary, isFirstSession);
+  async call(messages, kbContext, kbIds, intent, currentNotes, currentSummary, isFirstSession, timeContext) {
+    const systemPrompt = Prompts.getSystemPrompt(intent, kbContext, kbIds, currentNotes, currentSummary, isFirstSession, timeContext);
     const contextSummary = Prompts.getContextSummary(messages);
 
     const fullMessages = [
       ...(contextSummary ? [{ role: 'system', content: '## HISTÓRICO RECENTE\n\n' + contextSummary }] : []),
-      ...messages.slice(-30).map(m => ({ role: m.role, content: m.content }))
     ];
+
+    // Marcar início de nova sessão quando há histórico importado
+    if (!isFirstSession) {
+      fullMessages.push({
+        role: 'system',
+        content: '## NOVA SESSÃO\n\nAs mensagens abaixo são DESTA NOVA SESSÃO. O histórico acima é de sessões anteriores. A pessoa acabou de chegar para continuar. Receba-a com naturalidade e dê continuidade ao que vinham conversando. NÃO encerre a sessão — ela está apenas começando.'
+      });
+    }
+
+    fullMessages.push(...messages.slice(-30).map(m => ({ role: m.role, content: m.content })));
 
     const data = await this._request(fullMessages, null, systemPrompt);
 

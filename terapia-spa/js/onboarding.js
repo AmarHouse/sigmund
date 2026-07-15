@@ -42,7 +42,7 @@ const Onboarding = {
     document.getElementById('onboardingSignup').addEventListener('click', () => {
       overlay.remove();
       if (typeof SIGMUND_STRIPE !== 'undefined') {
-        SIGMUND_STRIPE.showPlans();
+        SIGMUND_STRIPE.showPremiumPlans();
       }
       UTILS.storage.set('onboarding_seen', true);
     });

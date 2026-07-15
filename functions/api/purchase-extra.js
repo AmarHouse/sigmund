@@ -12,6 +12,7 @@ export async function onRequest(context) {
 
     const params = new URLSearchParams({
       mode: 'payment',
+      locale: 'pt-BR',
       'payment_method_types[]': 'card',
       'line_items[0][price_data][currency]': 'brl',
       'line_items[0][price_data][product_data][name]': 'SIGMUND — Sessão Extra',

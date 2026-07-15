@@ -79,7 +79,7 @@ const Chat = {
       if (plansLink) {
         plansLink.addEventListener('click', (e) => {
           e.preventDefault();
-          if (typeof SIGMUND_STRIPE !== 'undefined') SIGMUND_STRIPE.showPlans();
+          if (typeof SIGMUND_STRIPE !== 'undefined') SIGMUND_STRIPE.showPremiumPlans();
         });
       }
     }, 0);
@@ -175,7 +175,33 @@ const Chat = {
       const currentNotes = SessionManager.getNotes();
       const currentSummary = SessionManager.getSummary();
       const isFirstSession = SessionManager.isFirstSession();
-      const response = await API.call(history, route.kbContext, route.kbIds, route.analysis.intent, currentNotes, currentSummary, isFirstSession);
+
+      // Build temporal context
+      const now = new Date();
+      const timeContext = {
+        currentDate: now.toLocaleDateString('pt-BR'),
+        currentDay: now.toLocaleDateString('pt-BR', { weekday: 'long' }),
+        currentTime: now.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }),
+      };
+      if (!isFirstSession) {
+        const allMsgs = SessionManager.current?.messages || [];
+        const lastAssistant = [...allMsgs].reverse().find(m => m.role === 'assistant' && !m.imported);
+        if (lastAssistant) {
+          const lastDate = new Date(lastAssistant.timestamp);
+          const diffMs = now - lastDate;
+          const diffHours = Math.floor(diffMs / 3600000);
+          const diffDays = Math.floor(diffMs / 86400000);
+          timeContext.lastSessionDate = lastDate.toLocaleDateString('pt-BR');
+          timeContext.daysSinceLastSession = diffDays;
+          if (diffHours < 1) timeContext.gapDescription = 'minutos atrás';
+          else if (diffHours === 1) timeContext.gapDescription = '1 hora atrás';
+          else if (diffHours < 24) timeContext.gapDescription = `${diffHours} horas atrás`;
+          else if (diffDays === 1) timeContext.gapDescription = 'ontem';
+          else timeContext.gapDescription = `${diffDays} dias atrás`;
+        }
+      }
+
+      const response = await API.call(history, route.kbContext, route.kbIds, route.analysis.intent, currentNotes, currentSummary, isFirstSession, timeContext);
 
       this._removeTypingIndicator(msgEl);
 

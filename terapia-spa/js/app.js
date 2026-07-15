@@ -269,21 +269,17 @@
     const premiumBtn = document.getElementById('headerPremiumBtn');
     if (premiumBtn) {
       premiumBtn.addEventListener('click', () => {
-        if (typeof SIGMUND_STRIPE !== 'undefined') SIGMUND_STRIPE.showPlans();
+        if (typeof SIGMUND_STRIPE !== 'undefined') SIGMUND_STRIPE.showPremiumPlans();
       });
     }
 
     // Nav buttons
-    const navBtns = document.querySelectorAll('.nav-item');
-    const setupNav = () => {
-      document.getElementById('navPremiumBtn')?.addEventListener('click', () => {
-        if (typeof SIGMUND_STRIPE !== 'undefined') SIGMUND_STRIPE.showPlans();
-      });
-      document.getElementById('navWLBtn')?.addEventListener('click', () => {
-        if (typeof SIGMUND_STRIPE !== 'undefined') SIGMUND_STRIPE.showWLInfo();
-      });
-    };
-    setupNav();
+    document.getElementById('navPremiumBtn')?.addEventListener('click', () => {
+      if (typeof SIGMUND_STRIPE !== 'undefined') SIGMUND_STRIPE.showPremiumPlans();
+    });
+    document.getElementById('navWLBtn')?.addEventListener('click', () => {
+      if (typeof SIGMUND_STRIPE !== 'undefined') SIGMUND_STRIPE.showWLPlans();
+    });
   }
 
   function setupExport() {

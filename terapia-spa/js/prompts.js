@@ -1,5 +1,15 @@
 const Prompts = {
-  getSystemPrompt(type, kbContext, kbIds, currentNotes, currentSummary, isFirstSession = true) {
+  getSystemPrompt(type, kbContext, kbIds, currentNotes, currentSummary, isFirstSession = true, timeContext = null) {
+
+    let temporalSection = '';
+    if (timeContext) {
+      temporalSection = `## CONTEXTO TEMPORAL\nData atual: ${timeContext.currentDate} (${timeContext.currentDay}) — ${timeContext.currentTime}\n`;
+      if (!isFirstSession && timeContext.lastSessionDate) {
+        temporalSection += `Última sessão: ${timeContext.lastSessionDate} (${timeContext.gapDescription || timeContext.daysSinceLastSession + ' dias atrás'})\n\nA pessoa está retornando para continuar a conversa. Use a data atual como referência.\n\n`;
+      } else {
+        temporalSection += `Primeira sessão com esta pessoa.\n\n`;
+      }
+    }
 
     let notesSection = '';
     if (currentNotes) {
@@ -40,7 +50,7 @@ As notas e o relato são confidenciais e visíveis apenas para você. NUNCA menc
     if (isFirstSession) {
       return `Você é SIGMUND, um terapeuta virtual em PRIMEIRA SESSÃO.
 
-VOCÊ ESTÁ EM UMA PRIMEIRA SESSÃO. Esta é a sua ÚNICA chance de fazer uma anamnese completa. Você DEVE ativamente conduzir a conversa para obter as informações abaixo. Não espere que a pessoa ofereça tudo espontaneamente — pergunte, de forma natural e acolhedora, UM item de cada vez.
+${temporalSection}VOCÊ ESTÁ EM UMA PRIMEIRA SESSÃO. Esta é a sua ÚNICA chance de fazer uma anamnese completa. Você DEVE ativamente conduzir a conversa para obter as informações abaixo. Não espere que a pessoa ofereça tudo espontaneamente — pergunte, de forma natural e acolhedora, UM item de cada vez.
 
 A pessoa já foi recebida com uma mensagem inicial. Agora sua função é conduzir a anamnese. A cada resposta sua, inclua UMA pergunta sobre um tópico que ainda não foi abordado.
 
@@ -174,7 +184,7 @@ ${notesFooter}`;
 
     return `Você é SIGMUND, um terapeuta virtual especializado em apoio emocional.
 
-Sua missão é ajudar a pessoa a compreender melhor suas emoções, pensamentos, comportamentos e necessidades por meio de uma conversa acolhedora, respeitosa e reflexiva.
+${temporalSection}Sua missão é ajudar a pessoa a compreender melhor suas emoções, pensamentos, comportamentos e necessidades por meio de uma conversa acolhedora, respeitosa e reflexiva.
 
 Seu foco principal não é resolver rapidamente os problemas, mas criar um espaço onde a pessoa possa pensar, elaborar e encontrar clareza.
 
