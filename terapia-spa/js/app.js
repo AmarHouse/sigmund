@@ -66,101 +66,47 @@
     const btn = document.getElementById('settingsBtn');
     const modal = document.getElementById('settingsModal');
     const close = document.getElementById('settingsClose');
-    const save = document.getElementById('settingsSave');
-    const clear = document.getElementById('settingsClear');
     const status = document.getElementById('settingsStatus');
+    const isDev = window.location.search.includes('dev=true');
 
+    // BYOK fields - only visible in dev mode
+    const devSection = document.getElementById('devSettings');
     const providerSelect = document.getElementById('providerSelect');
     const modelSelect = document.getElementById('modelSelect');
     const apiKeyInput = document.getElementById('apiKeyInput');
 
-    const savedProvider = UTILS.storage.get('provider', 'openrouter');
-    const savedModel = UTILS.storage.get('model', 'openai/gpt-4o-mini');
-    const savedApiKey = UTILS.storage.get('api_key', '');
+    if (devSection) devSection.style.display = isDev ? 'block' : 'none';
 
-    providerSelect.value = savedProvider;
-    apiKeyInput.value = savedApiKey;
-    updateModelOptions(savedProvider, savedModel, savedApiKey);
+    if (isDev) {
+      const savedProvider = UTILS.storage.get('provider', 'openrouter');
+      const savedModel = UTILS.storage.get('model', 'openai/gpt-4o-mini');
+      const savedApiKey = UTILS.storage.get('api_key', '');
+      providerSelect.value = savedProvider;
+      apiKeyInput.value = savedApiKey;
 
-    providerSelect.addEventListener('change', () => {
-      const key = apiKeyInput.value.trim();
-      updateModelOptions(providerSelect.value, null, key);
-    });
+      const save = document.getElementById('settingsSave');
+      if (save) {
+        save.addEventListener('click', async () => {
+          const provider = providerSelect.value;
+          const model = modelSelect.value;
+          const apiKey = apiKeyInput.value.trim();
+          UTILS.storage.set('provider', provider);
+          UTILS.storage.set('model', model);
+          if (apiKey) UTILS.storage.set('api_key', apiKey);
+          showToast('Configurações de desenvolvimento salvas');
+        });
+      }
+    }
 
     btn.addEventListener('click', () => {
       modal.classList.remove('modal-hidden');
-      status.style.display = 'none';
+      if (status) status.style.display = 'none';
     });
 
     close.addEventListener('click', () => closeModal(modal));
 
     modal.addEventListener('click', (e) => {
       if (e.target === modal) closeModal(modal);
-    });
-
-    save.addEventListener('click', async () => {
-      const provider = providerSelect.value;
-      const model = modelSelect.value;
-      const apiKey = apiKeyInput.value.trim();
-
-      UTILS.storage.set('provider', provider);
-      UTILS.storage.set('model', model);
-      if (apiKey) UTILS.storage.set('api_key', apiKey);
-
-      status.style.display = 'block';
-      status.className = 'settings-status';
-      status.textContent = 'Testando conexão...';
-
-      const result = await API.testConnection();
-      if (result.ok) {
-        status.className = 'settings-status success';
-        status.textContent = 'Conectado com sucesso!';
-        showToast('API configurada com sucesso');
-        setTimeout(() => closeModal(modal), 1000);
-      } else {
-        status.className = 'settings-status error';
-        status.textContent = result.error || 'Não foi possível conectar. Verifique a chave e o provedor selecionado.';
-      }
-    });
-
-    clear.addEventListener('click', () => {
-      if (confirm('Tem certeza? Todas as configurações e sessões serão apagadas.')) {
-        UTILS.storage.clear();
-        location.reload();
-      }
-    });
-  }
-
-  async function updateModelOptions(provider, selected, apiKey) {
-    const modelSelect = document.getElementById('modelSelect');
-    let models = null;
-
-    if (apiKey || provider === 'nvidia') {
-      const fetched = await API.fetchModels(provider, apiKey);
-      if (fetched) models = fetched;
-    }
-
-    if (!models) {
-      models = UTILS.getModelsForProvider(provider);
-    }
-
-    const preferred = UTILS.getModelsForProvider(provider);
-    let foundSelected = false;
-
-    modelSelect.innerHTML = '';
-    models.forEach(m => {
-      const opt = document.createElement('option');
-      opt.value = m;
-      opt.textContent = m;
-      if (selected && m === selected) {
-        opt.selected = true;
-        foundSelected = true;
-      }
-      if (!foundSelected && !selected && preferred.includes(m)) {
-        opt.selected = true;
-        foundSelected = true;
-      }
-      modelSelect.appendChild(opt);
     });
   }
 

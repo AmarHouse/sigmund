@@ -169,27 +169,8 @@
         <button class="settings-close" id="settingsClose">✕</button>
       </div>
       <div class="settings-body">
-        <div class="settings-group">
-          <span class="settings-label">Provedor de IA</span>
-          <span class="settings-description">Escolha o serviço para processar as respostas. Você precisa fornecer sua própria chave de API.</span>
-          <select class="settings-select" id="providerSelect">
-            <option value="openrouter">OpenRouter</option>
-            <option value="openai">OpenAI</option>
-            <option value="anthropic">Anthropic</option>
-            <option value="nvidia">NVIDIA NIM</option>
-            <option value="google">Google Gemini</option>
-          </select>
-        </div>
-        <div class="settings-group">
-          <span class="settings-label">Modelo</span>
-          <span class="settings-description">Modelo de IA para gerar as respostas.</span>
-          <select class="settings-select" id="modelSelect">
-          </select>
-        </div>
-        <div class="settings-group">
-          <span class="settings-label">Chave de API</span>
-          <span class="settings-description">Sua chave de API é armazenada apenas no seu navegador e nunca é enviada para nossos servidores.</span>
-          <input type="password" class="settings-input" id="apiKeyInput" placeholder="sk-... ou similar" autocomplete="off">
+        <div class="settings-group" style="text-align:center;">
+          <p style="color:var(--color-text-secondary);font-size:var(--font-size-sm);">SIGMUND — versão 1.0<br>Suas sessões são privadas e armazenadas apenas no seu navegador.</p>
         </div>
         <div class="settings-group">
           <div class="settings-toggle">
@@ -202,11 +183,31 @@
             </div>
           </div>
         </div>
-        <div class="settings-actions">
-          <button class="settings-btn primary" id="settingsSave">Salvar</button>
-          <button class="settings-btn secondary" id="settingsClear">Limpar dados</button>
+
+        <div id="devSettings" style="display:none;border-top:1px solid var(--color-border);padding-top:var(--space-4);margin-top:var(--space-4);">
+          <p style="font-size:var(--font-size-xs);color:var(--color-text-tertiary);margin-bottom:var(--space-3);">⚙️ Modo desenvolvedor</p>
+          <div class="settings-group">
+            <span class="settings-label">Provedor de IA</span>
+            <select class="settings-select" id="providerSelect">
+              <option value="openrouter">OpenRouter</option>
+              <option value="openai">OpenAI</option>
+              <option value="anthropic">Anthropic</option>
+              <option value="nvidia">NVIDIA NIM</option>
+              <option value="google">Google Gemini</option>
+            </select>
+          </div>
+          <div class="settings-group">
+            <span class="settings-label">Modelo</span>
+            <select class="settings-select" id="modelSelect"></select>
+          </div>
+          <div class="settings-group">
+            <span class="settings-label">Chave de API</span>
+            <input type="password" class="settings-input" id="apiKeyInput" placeholder="sk-... ou similar" autocomplete="off">
+          </div>
+          <div class="settings-actions">
+            <button class="settings-btn primary" id="settingsSave">Salvar configurações dev</button>
+          </div>
         </div>
-        <div id="settingsStatus" class="settings-status" style="display:none;"></div>
       </div>
     </div>
   </div>
