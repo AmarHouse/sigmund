@@ -7,6 +7,41 @@
       navigator.serviceWorker.register('/sw.js');
     }
 
+    // Mobile keyboard handling
+    if ('visualViewport' in window) {
+      const setVh = () => document.documentElement.style.setProperty('--vh', `${visualViewport.height * 0.01}px`);
+      visualViewport.addEventListener('resize', setVh);
+      setVh();
+
+      // Scroll input into view when keyboard opens
+      let lastHeight = visualViewport.height;
+      visualViewport.addEventListener('resize', () => {
+        const diff = lastHeight - visualViewport.height;
+        if (diff > 100) { // keyboard opened
+          setTimeout(() => {
+            const input = document.getElementById('chatInput');
+            if (input) input.scrollIntoView({ block: 'end' });
+          }, 100);
+        }
+        lastHeight = visualViewport.height;
+      });
+    }
+
+    // Swipe to close modals (mobile)
+    let touchStartY = 0;
+    document.addEventListener('touchstart', e => { touchStartY = e.touches[0].clientY; }, { passive: true });
+    document.addEventListener('touchend', e => {
+      const diff = e.changedTouches[0].clientY - touchStartY;
+      if (diff > 80) {
+        document.querySelectorAll('.modal-hidden, #plansOverlay, #gsiOverlay, #onboardingOverlay').forEach(el => {
+          if (el.style.display !== 'none' && !el.classList.contains('modal-hidden')) {
+            el.style.display = 'none';
+            el.classList.add('modal-hidden');
+          }
+        });
+      }
+    }, { passive: true });
+
     SessionManager.init();
     await KB.init();
 

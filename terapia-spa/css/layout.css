@@ -221,13 +221,32 @@
 .lp-footer { font-size: var(--font-size-xs); color: var(--color-text-tertiary); padding: var(--space-4) 0; opacity: 0.5; }
 
 @keyframes welcomeFadeIn {
-  from { opacity: 0; transform: translateY(20px); }
+  from { opacity: 0; transform: translateY(16px); }
   to { opacity: 1; transform: translateY(0); }
 }
 
 @keyframes messageSlideIn {
-  from { opacity: 0; transform: translateX(-12px); }
+  from { opacity: 0; transform: translateX(-10px); }
   to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes messageBounce {
+  0% { transform: scale(0.95); opacity: 0; }
+  60% { transform: scale(1.02); }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.message.user .message-body {
+  animation: messageBounce 0.25s ease-out;
+}
+
+.message.ai .message-body {
+  animation: fadeUp 0.35s ease-out;
 }
 
 .message {
@@ -574,36 +593,215 @@
 }
 
 @media (max-width: 768px) {
+  /* Safe area */
+  .app {
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+
+  body {
+    overscroll-behavior: none;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Header */
+  .app-header {
+    height: var(--header-height);
+    padding: 0 var(--space-3);
+  }
+  .app-logo-badge {
+    display: none;
+  }
+  .app-logo-icon {
+    width: 24px;
+    height: 24px;
+  }
+  .app-logo-text {
+    font-size: var(--font-size-md);
+  }
+  .header-btn {
+    width: 32px;
+    height: 32px;
+  }
+  .header-btn svg {
+    width: 16px;
+    height: 16px;
+  }
+  .header-btn-primary {
+    font-size: 11px;
+    padding: 0 var(--space-2);
+    height: 28px;
+  }
+  .header-user span {
+    font-size: 11px;
+  }
+  #userPlanBadge {
+    display: none !important;
+  }
+  .session-progress-bar {
+    width: 40px;
+    height: 2px;
+  }
+
+  /* Welcome / Landing */
   .chat-welcome {
-    padding: var(--space-8) var(--space-4) var(--space-6);
+    padding: var(--space-6) var(--space-4);
+    gap: var(--space-4);
+  }
+  .chat-welcome-icon-img {
+    width: 64px;
+    height: 64px;
+  }
+  .chat-welcome h1 {
+    font-size: var(--font-size-xl);
+  }
+  .lp-icon { width: 64px; height: 64px; }
+  .lp-title { font-size: var(--font-size-xl); }
+  .lp-subtitle { font-size: var(--font-size-base); }
+  .lp-description { font-size: var(--font-size-sm); }
+
+  /* Benefits grid → single column */
+  .lp-benefits {
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-2);
+    max-width: 100%;
+  }
+  .lp-benefit-item {
+    padding: var(--space-2);
+  }
+  .lp-benefit-item strong { font-size: 12px; }
+  .lp-benefit-item span { font-size: 11px; }
+
+  /* Steps */
+  .lp-steps { gap: var(--space-2); }
+  .lp-step { padding: var(--space-2) var(--space-3); }
+  .lp-step strong { font-size: 13px; }
+  .lp-step-num { width: 24px; height: 24px; font-size: 13px; }
+
+  /* Plan cards */
+  .lp-plans { flex-direction: column; }
+  .lp-plan-card { min-width: auto; }
+  .lp-plan-price strong { font-size: var(--font-size-lg); }
+  .lp-section-title { font-size: var(--font-size-md); }
+  .lp-free-note { font-size: 11px; }
+
+  /* Buttons */
+  .welcome-btn {
+    min-width: 140px;
+    padding: var(--space-3) var(--space-4);
+  }
+  .welcome-btn-icon { font-size: 20px; }
+  .welcome-btn-label { font-size: var(--font-size-sm); }
+  .welcome-btn-desc { font-size: 11px; }
+
+  /* Chat messages */
+  .message-content {
+    max-width: 88%;
+  }
+  .message-body {
+    font-size: var(--font-size-base);
+    padding: var(--space-3) var(--space-4);
+    border-radius: 16px;
+  }
+  .message-avatar {
+    width: 28px;
+    height: 28px;
+  }
+  .message-timestamp {
+    font-size: 10px;
+    margin-top: 2px;
   }
 
-  .chat-welcome-icon {
-    width: 48px;
-    height: 48px;
-    font-size: 22px;
-  }
-
-.welcome-session-label {
-  font-size: var(--font-size-sm);
-  color: var(--color-text-tertiary);
-  margin-top: calc(-1 * var(--space-3));
-}
-
-.chat-welcome h1 {
-    font-size: var(--font-size-lg);
-  }
-
+  /* Input area */
   .input-area {
-    padding: var(--space-2) var(--space-3) var(--space-3);
+    padding: var(--space-2) var(--space-3) calc(var(--space-2) + env(safe-area-inset-bottom, 0px));
   }
-
   .input-wrapper {
-    padding: var(--space-1) var(--space-1) var(--space-1) var(--space-4);
+    padding: var(--space-1) var(--space-1) var(--space-1) var(--space-3);
+    border-radius: 20px;
+  }
+  #chatInput {
+    font-size: var(--font-size-base);
+    min-height: 20px;
+    max-height: 80px;
+  }
+  .send-btn {
+    width: 34px;
+    height: 34px;
+  }
+  .send-btn svg {
+    width: 16px;
+    height: 16px;
   }
 
-  .send-btn {
-    width: 36px;
-    height: 36px;
+  /* Nav */
+  .app-nav {
+    height: var(--nav-height);
+    padding: 0 var(--space-2) env(safe-area-inset-bottom, 0px);
+    gap: 0;
+    justify-content: space-around;
+  }
+  .nav-item {
+    padding: var(--space-1) var(--space-2);
+    gap: 0;
+    min-width: 0;
+    flex: 1;
+  }
+  .nav-item svg {
+    width: 20px;
+    height: 20px;
+  }
+  .nav-item span {
+    display: none;
+  }
+
+  /* Emergency FAB */
+  .emergency-fab {
+    width: 44px;
+    height: 44px;
+    bottom: calc(var(--nav-height) + 12px + env(safe-area-inset-bottom, 0px));
+    right: 12px;
+    font-size: 20px;
+  }
+
+  /* Modals */
+  .settings-modal,
+  .session-modal,
+  .emergency-modal {
+    max-width: 100%;
+    max-height: 100%;
+    border-radius: 0;
+    width: 100%;
+    height: 100%;
+  }
+  .settings-body {
+    padding: var(--space-4);
+  }
+
+  /* Check-in */
+  #checkinOverlay {
+    bottom: calc(var(--nav-height) + 60px) !important;
+    right: var(--space-3) !important;
+    max-width: 260px !important;
+  }
+
+  /* Plans overlay - bottom sheet */
+  #plansOverlay {
+    align-items: flex-end !important;
+  }
+  #plansOverlay > div {
+    max-width: 100% !important;
+    border-radius: 20px 20px 0 0 !important;
+    margin-top: auto;
+    max-height: 85vh;
+    overflow-y: auto;
+    animation: bottomSheetUp 0.3s ease-out;
+  }
+  @keyframes bottomSheetUp {
+    from { transform: translateY(100%); }
+    to { transform: translateY(0); }
+  }
+  #plansOverlay:not(:empty) {
+    pointer-events: auto;
   }
 }

@@ -116,11 +116,21 @@
 
 @media (max-width: 768px) {
   :root {
-    --header-height: 52px;
-    --nav-height: 56px;
-    --input-height: 52px;
+    --header-height: 48px;
+    --nav-height: 52px;
+    --input-height: 48px;
+    --font-size-xs: 11px;
+    --font-size-sm: 13px;
+    --font-size-base: 15px;
+    --font-size-md: 15px;
+    --font-size-lg: 17px;
+    --font-size-xl: 20px;
+    --font-size-2xl: 24px;
+    --space-3: 10px;
     --space-4: 12px;
     --space-5: 16px;
     --space-6: 20px;
+    --radius-md: 10px;
+    --radius-lg: 14px;
   }
 }
