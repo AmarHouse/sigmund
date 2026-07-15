@@ -128,7 +128,7 @@ const Chat = {
               <p>Para o seu autocuidado</p>
               <div class="lp-plan-price"><strong>R$ 49</strong><span>/mês</span></div>
               <ul>
-                <li>Sessões dia sim, dia não</li>
+                <li>2 sessões por semana</li>
                 <li>Salvamento automático da conversa</li>
                 <li>Senha para proteger suas conversas</li>
               </ul>
@@ -336,8 +336,36 @@ const Chat = {
 
     } catch (err) {
       this._removeTypingIndicator(msgEl);
-      const errorMsg = err.message || 'Ocorreu um erro ao processar sua mensagem.';
-      this._addMessage('assistant', `⚠️ **${errorMsg}**\n\nVerifique suas configurações de API e tente novamente.`);
+      const errorMsg = err.message || '';
+      // Upsell from proxy
+      if (errorMsg.includes('upsell') || errorMsg.includes('sessão extra')) {
+        this._addMessage('assistant', `**Nossa conversa de hoje foi boa.** 😊
+
+Suas 2 sessões da semana já foram. Se quiser continuar agora, posso liberar mais uma por apenas **R\$ 19,90**.
+
+Quer continuar?`);
+        // Add extra purchase button
+        setTimeout(() => {
+          const lastMsg = document.querySelector('.message:last-child .message-body');
+          if (lastMsg) {
+            const btn = document.createElement('button');
+            btn.className = 'welcome-btn welcome-btn-primary';
+            btn.style.cssText = 'margin-top:var(--space-3);padding:var(--space-2) var(--space-4);font-size:var(--font-size-sm);';
+            btn.innerHTML = '🎟️ Quero uma sessão extra (R$ 19,90)';
+            btn.addEventListener('click', () => {
+              if (typeof SIGMUND_STRIPE !== 'undefined') {
+                SIGMUND_STRIPE.purchaseExtra(window.location.href).then(r => {
+                  if (r.url) window.location.href = r.url;
+                  else showToast('Erro ao processar pagamento');
+                });
+              }
+            });
+            lastMsg.appendChild(btn);
+          }
+        }, 500);
+      } else {
+        this._addMessage('assistant', `⚠️ **${errorMsg}**\n\nVerifique suas configurações de API e tente novamente.`);
+      }
     }
 
     this.isStreaming = false;

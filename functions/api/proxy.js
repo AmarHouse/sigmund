@@ -58,16 +58,22 @@ export async function onRequest(context) {
           }), { status: 200, headers: { 'Content-Type': 'application/json', ...CORS } });
         }
 
-        // Premium: check "dia sim, dia não"
-        if (userData.plan === 'premium' && userData.last_session === today) {
+        // Premium: check 2 sessions per week
+        const weekStart = getWeekStart();
+        if (userData.week !== weekStart) {
+          userData.week = weekStart;
+          userData.weekly_sessions = 0;
+        }
+        if (userData.plan === 'premium' && userData.weekly_sessions >= 2 && !userData.extra_available) {
           return new Response(JSON.stringify({
             upstreamStatus: 403,
-            body: JSON.stringify({ error: 'Sua sessão de hoje já foi realizada. Volte amanhã para continuarmos, ou adquira uma sessão extra.', upsell: true, extra: true }),
+            body: JSON.stringify({ error: 'Suas 2 sessões da semana já foram realizadas. Volte na próxima semana ou adquira uma sessão extra por R$ 19,90.', upsell: true, extra: true }),
           }), { status: 200, headers: { 'Content-Type': 'application/json', ...CORS } });
         }
 
         // Update session count
         userData.sessions = (userData.sessions || 0) + 1;
+        userData.weekly_sessions = (userData.weekly_sessions || 0) + 1;
         userData.last_session = today;
         await env.SESSIONS.put(`user:${userId}`, JSON.stringify(userData));
       }
@@ -145,6 +151,14 @@ function proxyResponse(status, text, cors) {
     status: 200,
     headers: { 'Content-Type': 'application/json', ...cors },
   });
+}
+
+function getWeekStart() {
+  const now = new Date();
+  const day = now.getDay();
+  const diff = now.getDate() - day + (day === 0 ? -6 : 1);
+  const monday = new Date(now.setDate(diff));
+  return monday.toISOString().slice(0, 10);
 }
 
 function extractErrorMessage(err) {

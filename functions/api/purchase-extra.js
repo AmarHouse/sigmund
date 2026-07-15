@@ -6,7 +6,7 @@ export async function onRequest(context) {
   if (request.method !== 'POST') return new Response('Method Not Allowed', { status: 405, headers: CORS });
 
   try {
-    const { success_url } = await request.json();
+    const { success_url, user_id } = await request.json();
     const key = env.STRIPE_SECRET_KEY;
     if (!key) return new Response(JSON.stringify({ error: 'Stripe não configurado' }), { status: 200, headers: { 'Content-Type': 'application/json', ...CORS } });
 
@@ -22,6 +22,7 @@ export async function onRequest(context) {
       'success_url': success_url || 'https://sigmund-4fn.pages.dev/',
       'cancel_url': 'https://sigmund-4fn.pages.dev/',
       'metadata[type]': 'extra_session',
+      'metadata[user_id]': user_id || '',
     });
 
     const resp = await fetch('https://api.stripe.com/v1/checkout/sessions', {

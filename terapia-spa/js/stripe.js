@@ -7,7 +7,7 @@ const SIGMUND_STRIPE = {
       tag: 'Mais escolhido',
       tagline: 'Para o seu autocuidado',
       features: [
-        'Converse dia sim, dia não — sem pressa',
+        '2 sessões por semana — sem pressa',
         'Cada conversa com até 50 trocas',
         'Inteligência artificial treinada para acolher',
         'Salvamento automático da sua história',
@@ -65,10 +65,11 @@ const SIGMUND_STRIPE = {
   },
 
   async purchaseExtra(successUrl) {
+    const userId = UTILS.storage.get('user_id', '');
     const resp = await fetch('/api/purchase-extra', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ success_url: successUrl }),
+      body: JSON.stringify({ success_url: successUrl, user_id: userId }),
     });
     return resp.json();
   },
@@ -164,7 +165,7 @@ const SIGMUND_STRIPE = {
         <h2 style="margin:0;font-size:var(--font-size-lg);">Cuidar de você faz bem</h2>
         <p style="margin:var(--space-1) 0 0;font-size:var(--font-size-sm);color:var(--color-text-secondary);line-height:var(--line-height-relaxed);">
           A primeira conversa é por minha conta. Depois, por <strong>R$ 49/mês</strong>, você tem 
-          encontros regulares com SIGMUND — um espaço seu, sem julgamentos, sempre que precisar.
+          2 sessões por semana com SIGMUND. Se quiser mais, sessões extras por R$ 19,90.
         </p>
       </div>
       <div data-plan-section="user">

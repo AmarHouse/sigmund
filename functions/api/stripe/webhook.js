@@ -15,17 +15,22 @@ export async function onRequest(context) {
       const customerId = session.customer;
       const plan = session.metadata?.plan || 'premium';
       const userId = session.metadata?.user_id || '';
+      const type = session.metadata?.type || 'subscription';
       if (env.SESSIONS) {
         // Store stripe mapping
         if (customerId) {
           await env.SESSIONS.put(`stripe:${customerId}`, JSON.stringify({ plan, userId, active: true, created: new Date().toISOString() }));
         }
-        // Update user plan in KV
+        // Update user plan or add extra session
         if (userId) {
           const userData = await env.SESSIONS.get(`user:${userId}`, 'json');
           if (userData) {
-            userData.plan = plan;
-            userData.stripeCustomerId = customerId;
+            if (type === 'extra_session') {
+              userData.extra_available = (userData.extra_available || 0) + 1;
+            } else {
+              userData.plan = plan;
+              userData.stripeCustomerId = customerId;
+            }
             await env.SESSIONS.put(`user:${userId}`, JSON.stringify(userData));
           }
         }
