@@ -14,6 +14,30 @@
     }
 
     updateSessionIndicator();
+
+    // Auto night mode (22h-6h)
+    const hour = new Date().getHours();
+    const isDarkHour = hour < 6 || hour >= 22;
+    const savedTheme = UTILS.storage.get('theme', '');
+    if (savedTheme === '' && isDarkHour) {
+      document.documentElement.setAttribute('data-theme', 'dark');
+      UTILS.storage.set('theme', 'dark');
+    }
+
+    // Show onboarding after 1st session (when session has messages and no account)
+    setTimeout(() => {
+      if (session && session.messages.length >= 3 && !CryptoUtils.hasEmail()) {
+        Onboarding.showAfterFreeSession();
+      }
+    }, 2000);
+
+    // Check-in between sessions
+    setTimeout(() => {
+      const lastSession = UTILS.storage.get('last_session', null);
+      if (lastSession && !CryptoUtils.hasEmail()) {
+        Onboarding.showCheckIn();
+      }
+    }, 3000);
   }
 
   function setupUI() {
@@ -158,10 +182,13 @@
   function setupEmergency() {
     const btn = document.getElementById('emergencyBtn');
     const quickBtn = document.getElementById('emergencyQuickBtn');
+    const fabBtn = document.getElementById('emergencyFab');
     const modal = document.getElementById('emergencyModal');
     const close = document.getElementById('emergencyModalClose');
 
     const show = () => modal.classList.remove('modal-hidden');
+
+    if (fabBtn) fabBtn.addEventListener('click', show);
     const hide = () => modal.classList.add('modal-hidden');
 
     btn.addEventListener('click', show);

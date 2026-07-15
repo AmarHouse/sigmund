@@ -126,8 +126,11 @@
         </svg>
         <span>Importar</span>
       </button>
-      <input type="file" id="importFileInput" accept=".sgm,.md" style="display:none">
+          <input type="file" id="importFileInput" accept=".sgm,.md" style="display:none">
     </nav>
+    <button id="emergencyFab" title="Precisa de ajuda agora?" aria-label="Ajuda em crise" style="position:fixed;bottom:80px;right:var(--space-4);width:56px;height:56px;border-radius:var(--radius-full);background:var(--color-emergency);color:white;border:none;font-size:24px;cursor:pointer;box-shadow:0 4px 16px rgba(255,59,48,0.4);z-index:50;display:flex;align-items:center;justify-content:center;transition:transform var(--transition-fast);" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">
+      &#x2764;&#xFE0F;
+    </button>
   </div>
 
   <button class="emergency-fab" id="emergencyBtn" title="Ajuda imediata" aria-label="Ajuda em crise">
@@ -241,6 +244,7 @@
   <script src="js/crypto.js"></script>
   <script src="js/stripe.js"></script>
   <script src="js/dashboard.js"></script>
+  <script src="js/onboarding.js"></script>
   <script src="js/session.js"></script>
   <script src="js/kb.js"></script>
   <script src="js/prompts.js"></script>
