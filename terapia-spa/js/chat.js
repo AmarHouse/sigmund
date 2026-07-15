@@ -16,7 +16,10 @@ const Chat = {
     if (firstBtn) {
       firstBtn.addEventListener('click', () => {
         this._hideWelcome();
-        const greeting = 'Olá! Eu sou o SIGMUND, mas pode me chamar de Sig. Que bom que você está aqui.\n\n👉 Se você já tem uma conversa salva (arquivo .sgm), clique em **Continuar** no menu abaixo para importá-la.\n\nSe está começando do zero, me conte como prefere ser chamado(a) e o que te trouxe até aqui.';
+        const hasAccount = CryptoUtils.hasEmail();
+        const greeting = hasAccount
+          ? 'Olá! Eu sou o SIGMUND, mas pode me chamar de Sig. Que bom que você está aqui.\n\nSe já tem uma conversa salva, clique em **Continuar** no menu abaixo para importá-la. Se está começando do zero, me conte como prefere ser chamado(a) e o que te trouxe até aqui.'
+          : 'Olá! Eu sou o SIGMUND, mas pode me chamar de Sig. Que bom que você está aqui.\n\nPara começarmos, me conte como prefere ser chamado(a) e o que te trouxe até aqui.';
         SessionManager.addMessage('assistant', greeting);
         this._addMessage('assistant', greeting);
       });
@@ -24,7 +27,12 @@ const Chat = {
 
     if (importBtn && fileInput) {
       importBtn.addEventListener('click', () => {
-        fileInput.click();
+        if (CryptoUtils.hasEmail()) {
+          fileInput.click();
+        } else {
+          if (typeof SIGMUND_STRIPE !== 'undefined') SIGMUND_STRIPE.showPremiumPlans();
+          showToast('🔒 Importar conversas disponível no plano Premium');
+        }
       });
     }
   },

@@ -236,7 +236,12 @@
     const fileInput = document.getElementById('importFileInput');
 
     btn.addEventListener('click', () => {
-      fileInput.click();
+      if (CryptoUtils.hasEmail()) {
+        fileInput.click();
+      } else {
+        if (typeof SIGMUND_STRIPE !== 'undefined') SIGMUND_STRIPE.showPremiumPlans();
+        showToast('🔒 Importar disponível no plano Premium');
+      }
     });
 
     fileInput.addEventListener('change', async () => {
