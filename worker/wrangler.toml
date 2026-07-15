@@ -22,6 +22,10 @@ PRIMARY_MODEL = "deepseek/deepseek-v4-flash"
 FALLBACK_MODEL = "qwen/qwen-3.5-122b"
 SECOND_FALLBACK_MODEL = "zhipu/glm-5.2"
 GOOGLE_CLIENT_ID = "YOUR_GOOGLE_CLIENT_ID_HERE"
-STRIPE_SECRET_KEY = "YOUR_STRIPE_SECRET_KEY_HERE"
-STRIPE_WEBHOOK_SECRET = "YOUR_STRIPE_WEBHOOK_SECRET_HERE"
-SENDGRID_API_KEY = "YOUR_SENDGRID_API_KEY_HERE"
+# Chaves sensíveis - NÃO coloque valores reais aqui.
+# Use `wrangler secret put NOME_DA_CHAVE` para configurar em produção.
+# Exemplo: wrangler secret put STRIPE_SECRET_KEY
+STRIPE_SECRET_KEY = ""
+STRIPE_WEBHOOK_SECRET = ""
+SENDGRID_API_KEY = ""
+OPENROUTER_API_KEY = ""

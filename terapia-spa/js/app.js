@@ -108,6 +108,29 @@
       providerSelect.value = savedProvider;
       apiKeyInput.value = savedApiKey;
 
+      // Load models on provider change
+      const loadModels = async () => {
+        const p = providerSelect.value;
+        const key = apiKeyInput.value.trim();
+        let models = null;
+        if (key || p === 'nvidia' || p === 'openrouter') {
+          const fetched = await API.fetchModels(p, key);
+          if (fetched) models = fetched;
+        }
+        if (!models) models = UTILS.getModelsForProvider(p);
+        modelSelect.innerHTML = '';
+        const preferred = UTILS.getModelsForProvider(p);
+        let found = false;
+        models.forEach(m => {
+          const opt = document.createElement('option');
+          opt.value = m; opt.textContent = m;
+          if (!found && preferred.includes(m)) { opt.selected = true; found = true; }
+          modelSelect.appendChild(opt);
+        });
+      };
+      providerSelect.addEventListener('change', loadModels);
+      setTimeout(loadModels, 100);
+
       const save = document.getElementById('settingsSave');
       if (save) {
         save.addEventListener('click', async () => {

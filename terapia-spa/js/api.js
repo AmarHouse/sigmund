@@ -1,4 +1,32 @@
 const API = {
+  async fetchModels(provider, apiKey) {
+    const endpoints = {
+      nvidia: { url: 'https://integrate.api.nvidia.com/v1/models', needsAuth: false },
+      openai: { url: 'https://api.openai.com/v1/models', needsAuth: true },
+      openrouter: { url: 'https://openrouter.ai/api/v1/models', needsAuth: false },
+      anthropic: null,
+      google: null,
+    };
+    const cfg = endpoints[provider];
+    if (!cfg) return null;
+    try {
+      const headers = { 'Content-Type': 'application/json' };
+      if (cfg.needsAuth && apiKey) headers['Authorization'] = `Bearer ${apiKey}`;
+      const resp = await fetch('/api/proxy', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ url: cfg.url, method: 'GET', headers, body: null }),
+      });
+      const data = await resp.json();
+      if (data.upstreamStatus && data.body) {
+        const parsed = JSON.parse(data.body);
+        const models = (parsed.data || []).map(m => m.id || m).filter(Boolean);
+        return models.length > 0 ? models : null;
+      }
+      return null;
+    } catch { return null; }
+  },
+
   async _request(messages, model, systemPrompt, extra = {}) {
     const body = {
       model: model || 'deepseek/deepseek-v4-flash',

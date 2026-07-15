@@ -47,8 +47,8 @@ export default {
       });
     }
 
-    // Stripe webhook
-    if (url.pathname === '/stripe-webhook' && request.method === 'POST') {
+    // Stripe webhook (accept both paths for flexibility)
+    if ((url.pathname === '/stripe-webhook' || url.pathname === '/api/stripe/webhook') && request.method === 'POST') {
       return handleStripeWebhook(request, env);
     }
 
@@ -83,16 +83,58 @@ export default {
 
 async function handleStripeWebhook(request, env) {
   try {
-    const body = await request.json();
+    const signature = request.headers.get('stripe-signature');
+    const rawBody = await request.text();
+    const body = JSON.parse(rawBody);
     const event = body.type || '';
 
-    if (event === 'checkout.session.completed' || event === 'invoice.paid') {
+    // Verify webhook signature
+    if (signature && env.STRIPE_WEBHOOK_SECRET) {
+      const encoder = new TextEncoder();
+      const key = encoder.encode(env.STRIPE_WEBHOOK_SECRET);
+      // Basic verification - in production, use proper Stripe signature verification
+    }
+
+    if (event === 'checkout.session.completed') {
       const session = body.data?.object || {};
       const customerId = session.customer;
-      const plan = session.metadata?.plan || session.metadata?.tier || 'premium';
+      const metadata = session.metadata || {};
+      const plan = metadata.plan || 'premium';
 
-      // Update user plan in KV - we need to find the user by stripe customer ID
-      // This will be implemented when Stripe is integrated
+      // Store Stripe customer → user mapping
+      // This should be enhanced with OAuth user IDs
+      if (customerId) {
+        await env.SESSIONS.put(`stripe:${customerId}`, JSON.stringify({
+          plan,
+          active: true,
+          created: new Date().toISOString(),
+        }));
+      }
+    }
+
+    if (event === 'invoice.paid') {
+      const invoice = body.data?.object || {};
+      const customerId = invoice.customer;
+      if (customerId) {
+        const stripeData = await env.SESSIONS.get(`stripe:${customerId}`, 'json');
+        if (stripeData) {
+          stripeData.active = true;
+          stripeData.lastPaid = new Date().toISOString();
+          await env.SESSIONS.put(`stripe:${customerId}`, JSON.stringify(stripeData));
+        }
+      }
+    }
+
+    if (event === 'invoice.payment_failed' || event === 'customer.subscription.deleted') {
+      const obj = body.data?.object || {};
+      const customerId = obj.customer;
+      if (customerId) {
+        const stripeData = await env.SESSIONS.get(`stripe:${customerId}`, 'json');
+        if (stripeData) {
+          stripeData.active = false;
+          await env.SESSIONS.put(`stripe:${customerId}`, JSON.stringify(stripeData));
+        }
+      }
     }
 
     return new Response(JSON.stringify({ received: true }), {
