@@ -14,7 +14,6 @@ id = "YOUR_KV_ID_HERE"
 preview_id = "YOUR_KV_PREVIEW_ID_HERE"
 
 [vars]
-OPENROUTER_API_KEY = "YOUR_OPENROUTER_KEY_HERE"
 DEEPSEEK_MODEL = "deepseek/deepseek-v4-flash"
 QWEN_MODEL = "qwen/qwen-3.5-122b"
 GLM_MODEL = "zhipu/glm-5.2"
@@ -22,10 +21,6 @@ PRIMARY_MODEL = "deepseek/deepseek-v4-flash"
 FALLBACK_MODEL = "qwen/qwen-3.5-122b"
 SECOND_FALLBACK_MODEL = "zhipu/glm-5.2"
 GOOGLE_CLIENT_ID = "YOUR_GOOGLE_CLIENT_ID_HERE"
-# Chaves sensíveis - NÃO coloque valores reais aqui.
-# Use `wrangler secret put NOME_DA_CHAVE` para configurar em produção.
-# Exemplo: wrangler secret put STRIPE_SECRET_KEY
-STRIPE_SECRET_KEY = ""
-STRIPE_WEBHOOK_SECRET = ""
-SENDGRID_API_KEY = ""
-OPENROUTER_API_KEY = ""
+
+# Chaves sensíveis: configurar via `wrangler secret put NOME`
+# Ex: wrangler secret put STRIPE_SECRET_KEY
