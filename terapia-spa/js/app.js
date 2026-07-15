@@ -254,7 +254,6 @@
     if (fabBtn) fabBtn.addEventListener('click', show);
     const hide = () => modal.classList.add('modal-hidden');
 
-    btn.addEventListener('click', show);
     quickBtn.addEventListener('click', show);
     close.addEventListener('click', hide);
     modal.addEventListener('click', (e) => {
