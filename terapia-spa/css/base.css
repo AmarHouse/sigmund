@@ -85,7 +85,12 @@ ul, ol {
 
 button:focus:not(:focus-visible),
 input:focus:not(:focus-visible),
-textarea:focus:not(:focus-visible) {
+textarea:focus:not(:focus-visible),
+.input-wrapper:focus-within {
+  outline: none;
+}
+
+.input-wrapper:focus-within textarea:focus-visible {
   outline: none;
 }
 
