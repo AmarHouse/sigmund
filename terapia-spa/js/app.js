@@ -2,6 +2,11 @@
   'use strict';
 
   async function init() {
+    // Register Service Worker for PWA
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/sw.js');
+    }
+
     SessionManager.init();
     await KB.init();
 
