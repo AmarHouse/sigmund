@@ -108,6 +108,8 @@ const UTILS = {
 
   renderMarkdown(text) {
     text = text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    text = text.replace(/^---$/gm, '<hr>');
+    text = text.replace(/^\*\*\*$/gm, '<hr>');
     text = text.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
     text = text.replace(/\*(.+?)\*/g, '<em>$1</em>');
     text = text.replace(/```(\w*)\n([\s\S]*?)```/g, '<pre><code>$2</code></pre>');
