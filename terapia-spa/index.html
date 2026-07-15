@@ -195,16 +195,12 @@
       </button>
       <input type="file" id="importFileInput" accept=".sgm,.md" style="display:none">
     </nav>
-    <button id="emergencyFab" title="Precisa de ajuda agora?" aria-label="Ajuda em crise" style="position:fixed;bottom:80px;right:var(--space-4);width:56px;height:56px;border-radius:var(--radius-full);background:var(--color-emergency);color:white;border:none;font-size:24px;cursor:pointer;box-shadow:0 4px 16px rgba(255,59,48,0.4);z-index:50;display:flex;align-items:center;justify-content:center;transition:transform var(--transition-fast);" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">
-      &#x2764;&#xFE0F;
+    <button class="emergency-fab" id="emergencyFab" title="Ajuda imediata" aria-label="Ajuda em crise">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><polyline points="12 9 12 13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+      </svg>
     </button>
   </div>
-
-  <button class="emergency-fab" id="emergencyBtn" title="Ajuda imediata" aria-label="Ajuda em crise">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-      <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
-    </svg>
-  </button>
 
   <div class="emergency-modal-overlay modal-hidden" id="emergencyModal">
     <div class="emergency-modal">

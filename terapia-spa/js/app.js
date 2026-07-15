@@ -244,7 +244,6 @@
   }
 
   function setupEmergency() {
-    const btn = document.getElementById('emergencyBtn');
     const quickBtn = document.getElementById('emergencyQuickBtn');
     const fabBtn = document.getElementById('emergencyFab');
     const modal = document.getElementById('emergencyModal');
