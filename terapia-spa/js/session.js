@@ -279,6 +279,7 @@ const SessionManager = {
     session.updated = UTILS.timestamp();
     if (summary) session._summary = summary;
     if (notes) session._notes = notes + '\n\n' + session._notes;
+    session._isFirstSession = false;
     if (imported.length > 0) {
       const firstUser = imported.find(m => m.role === 'user');
       if (firstUser) {

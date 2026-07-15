@@ -314,9 +314,10 @@ const Chat = {
       this._addMessage(role, cleanResponse);
 
       // Auto-export at the end of session
-      const msgCount = SessionManager.current?.messages?.length || 0;
-      const firstUserIdx = SessionManager.current?.messages?.findIndex(m => m.role === 'user' && !m.imported) || 0;
-      const sessionMsgCount = msgCount - firstUserIdx;
+      const allMessages = SessionManager.current?.messages || [];
+      const msgCount = allMessages.length;
+      const firstUserIdx = allMessages.findIndex(m => m.role === 'user' && !m.imported);
+      const sessionMsgCount = firstUserIdx >= 0 ? msgCount - firstUserIdx : msgCount;
 
       // Update session progress indicator
       this._updateProgress(sessionMsgCount);
@@ -474,21 +475,26 @@ const Chat = {
       a.click();
       URL.revokeObjectURL(url);
 
-      // Store in localStorage for re-download (encrypted if PIN is set)
-      const storeData = async () => {
-        if (CryptoUtils.hasPin()) {
-          const encrypted = await CryptoUtils.encrypt(content, CryptoUtils.getPin());
+      // Store in localStorage for re-download
+      if (CryptoUtils.hasPin()) {
+        CryptoUtils.encrypt(content, CryptoUtils.getPin()).then(encrypted => {
           UTILS.storage.set('last_session_encrypted', encrypted);
-          UTILS.storage.set('last_session_has_pin', 'true');
-        } else {
-          UTILS.storage.set('last_session_raw', content);
-          UTILS.storage.remove('last_session_has_pin');
-        }
-      };
-      storeData();
+          UTILS.storage.set('last_session', content);
+        });
+      } else {
+        UTILS.storage.set('last_session', content);
+        UTILS.storage.remove('last_session_encrypted');
+      }
     };
 
     finishExport(data);
+
+    // Show onboarding if user is not logged in
+    if (!CryptoUtils.hasEmail()) {
+      setTimeout(() => {
+        if (typeof Onboarding !== 'undefined') Onboarding.showAfterFreeSession();
+      }, 1000);
+    }
 
     // Show message in chat
     const lastMsg = document.querySelector('.message:last-child .message-body');
