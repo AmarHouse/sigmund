@@ -308,7 +308,6 @@
 
   function setupEmergency() {
     const quickBtn = document.getElementById('emergencyQuickBtn');
-    const fabBtn = document.getElementById('emergencyFab');
     const modal = document.getElementById('emergencyModal');
     const close = document.getElementById('emergencyModalClose');
 
@@ -316,8 +315,6 @@
       modal.classList.remove('modal-hidden');
       setTimeout(() => trapFocus(modal), 100);
     };
-
-    if (fabBtn) fabBtn.addEventListener('click', show);
     const hide = () => { releaseFocusTrap(); modal.classList.add('modal-hidden'); };
 
     quickBtn.addEventListener('click', show);

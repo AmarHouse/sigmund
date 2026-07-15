@@ -738,11 +738,6 @@
     display: none !important;
   }
 
-  /* Emergency FAB - hidden on mobile, use inline crisis link instead */
-  .emergency-fab {
-    display: none;
-  }
-
   #emergencyQuickBtn {
     font-size: var(--font-size-sm) !important;
     padding: var(--space-1) var(--space-3);
