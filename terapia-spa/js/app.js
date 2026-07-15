@@ -149,6 +149,7 @@
     setupEmergency();
     setupExport();
     setupImport();
+    setupHome();
     setupNewSession();
   }
 
@@ -422,8 +423,18 @@
     });
   }
 
+  function setupHome() {
+    const btn = document.getElementById('homeBtn');
+    if (btn) {
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        Chat.goHome();
+      });
+    }
+  }
+
   function setupNewSession() {
-    const btns = [document.getElementById('newSessionBtn'), document.getElementById('newSessionBtn2')];
+    const btns = [document.getElementById('newSessionBtn2')];
 
     btns.forEach(btn => {
       if (!btn) return;

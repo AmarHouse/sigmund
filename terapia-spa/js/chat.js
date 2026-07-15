@@ -90,6 +90,14 @@ const Chat = {
     });
   },
 
+  goHome() {
+    const container = document.getElementById('chatMessages');
+    container.querySelectorAll('.message, .typing-bar, .message-typing, .typing-indicator').forEach(el => el.remove());
+    this._renderWelcome();
+    document.getElementById('chatContainer')?.scrollTo({ top: 0, behavior: 'smooth' });
+    document.getElementById('sendBtn').disabled = true;
+  },
+
   _hideWelcome() {
     const el = document.getElementById('welcomeScreen');
     if (el) el.style.display = 'none';
