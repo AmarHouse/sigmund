@@ -16,7 +16,7 @@ const Chat = {
     if (firstBtn) {
       firstBtn.addEventListener('click', () => {
         this._hideWelcome();
-        const greeting = 'Olá! Eu sou o SIGMUND, mas pode me chamar de Sig. Que bom que você está aqui. Para começarmos, gostaria de saber como prefere ser chamado(a). Pode me contar um pouco sobre o que te trouxe até aqui?';
+        const greeting = 'Olá! Eu sou o SIGMUND, mas pode me chamar de Sig. Que bom que você está aqui.\n\n👉 Se você já tem uma conversa salva (arquivo .sgm), clique em **Continuar** no menu abaixo para importá-la.\n\nSe está começando do zero, me conte como prefere ser chamado(a) e o que te trouxe até aqui.';
         SessionManager.addMessage('assistant', greeting);
         this._addMessage('assistant', greeting);
       });
@@ -50,8 +50,8 @@ const Chat = {
           <div class="lp-ctas">
             <button class="welcome-btn welcome-btn-primary" id="welcomeFirstSession">
               <span class="welcome-btn-icon">&#x1F331;</span>
-              <span class="welcome-btn-label">Conversar agora</span>
-              <span class="welcome-btn-desc">Primeira sessão gratuita</span>
+            <span class="welcome-btn-label">Conversar agora</span>
+            <span class="welcome-btn-desc">Grátis para começar</span>
             </button>
             <button class="welcome-btn" id="welcomeImport">
               <span class="welcome-btn-icon">&#x1F4C2;</span>
