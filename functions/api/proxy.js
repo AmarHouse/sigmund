@@ -38,6 +38,41 @@ export async function onRequest(context) {
     let reqBody;
     try { reqBody = JSON.parse(body || '{}'); } catch { reqBody = {}; }
 
+    // Session control
+    const userId = request.headers.get('X-User-Id') || '';
+    if (userId && env.SESSIONS) {
+      const userData = await env.SESSIONS.get(`user:${userId}`, 'json');
+      if (userData) {
+        const month = new Date().toISOString().slice(0, 7);
+        if (userData.month !== month) {
+          userData.month = month;
+          userData.sessions = 0;
+        }
+        const today = new Date().toISOString().slice(0, 10);
+
+        // Free users: 1 session only
+        if (userData.plan === 'free' && userData.sessions >= 1 && !userData.extra_available) {
+          return new Response(JSON.stringify({
+            upstreamStatus: 403,
+            body: JSON.stringify({ error: 'Sua sessão gratuita já foi utilizada. Crie sua conta e escolha um plano para continuar.', upsell: true }),
+          }), { status: 200, headers: { 'Content-Type': 'application/json', ...CORS } });
+        }
+
+        // Premium: check "dia sim, dia não"
+        if (userData.plan === 'premium' && userData.last_session === today) {
+          return new Response(JSON.stringify({
+            upstreamStatus: 403,
+            body: JSON.stringify({ error: 'Sua sessão de hoje já foi realizada. Volte amanhã para continuarmos, ou adquira uma sessão extra.', upsell: true, extra: true }),
+          }), { status: 200, headers: { 'Content-Type': 'application/json', ...CORS } });
+        }
+
+        // Update session count
+        userData.sessions = (userData.sessions || 0) + 1;
+        userData.last_session = today;
+        await env.SESSIONS.put(`user:${userId}`, JSON.stringify(userData));
+      }
+    }
+
     const masterKey = env.OPENROUTER_API_KEY;
     if (!masterKey) {
       return new Response(JSON.stringify({

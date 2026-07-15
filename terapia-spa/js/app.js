@@ -360,16 +360,90 @@
       nameEl.style.display = 'inline';
       nameEl.textContent = `👤 ${name || email.split('@')[0]}`;
       if (planEl) {
-        planEl.style.display = 'inline';
-        planEl.textContent = '⭐ Premium';
+        const userPlan = UTILS.storage.get('user_plan', 'free');
+        if (userPlan !== 'free') {
+          planEl.style.display = 'inline';
+          planEl.textContent = `⭐ ${userPlan === 'premium' ? 'Premium' : userPlan === 'wl_essential' ? 'Profissional' : 'Pro'}`;
+        } else {
+          planEl.style.display = 'none';
+        }
       }
     } else {
       loginBtn.style.display = 'inline-flex';
       nameEl.style.display = 'none';
       if (planEl) planEl.style.display = 'none';
       loginBtn.addEventListener('click', () => {
-        if (typeof SIGMUND_STRIPE !== 'undefined') SIGMUND_STRIPE.showPremiumPlans();
+        showGoogleSignIn();
       });
+    }
+  }
+
+  function showGoogleSignIn() {
+    const existing = document.getElementById('gsiOverlay');
+    if (existing) existing.remove();
+
+    const overlay = document.createElement('div');
+    overlay.id = 'gsiOverlay';
+    overlay.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;z-index:2000;padding:var(--space-4);';
+    overlay.addEventListener('click', e => { if (e.target === overlay) overlay.remove(); });
+
+    const modal = document.createElement('div');
+    modal.style.cssText = 'background:var(--color-surface);border-radius:var(--radius-lg);padding:var(--space-6);max-width:380px;width:100%;text-align:center;box-shadow:0 25px 80px rgba(0,0,0,0.3);';
+
+    modal.innerHTML = `
+      <button onclick="this.closest('#gsiOverlay').remove()" style="position:absolute;top:var(--space-3);right:var(--space-3);background:none;border:none;font-size:18px;cursor:pointer;color:var(--color-text-tertiary);">✕</button>
+      <div style="font-size:40px;margin-bottom:var(--space-3);">&#x1F512;</div>
+      <h2 style="margin:0 0 var(--space-1);font-size:var(--font-size-lg);">Crie sua conta</h2>
+      <p style="color:var(--color-text-secondary);font-size:var(--font-size-sm);margin-bottom:var(--space-5);">Entre com sua conta Google para salvar suas sessões e acessar de qualquer lugar.</p>
+      <div id="gsiContainer" style="display:flex;justify-content:center;"></div>
+      <p style="font-size:var(--font-size-xs);color:var(--color-text-tertiary);margin-top:var(--space-4);">Ao entrar, você concorda que suas sessões serão vinculadas ao seu email.</p>
+    `;
+    modal.style.position = 'relative';
+    overlay.appendChild(modal);
+    document.body.appendChild(overlay);
+
+    // Render Google Sign-In button
+    if (typeof google !== 'undefined' && google.accounts) {
+      google.accounts.id.initialize({
+        client_id: 'YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com',
+        callback: handleGoogleCredential,
+      });
+      google.accounts.id.renderButton(document.getElementById('gsiContainer'), {
+        theme: 'outline', size: 'large', width: 280, text: 'signin_with',
+      });
+    } else {
+      document.getElementById('gsiContainer').innerHTML = '<p style="font-size:var(--font-size-xs);color:var(--color-text-secondary);">Configure o Google Client ID nas variáveis de ambiente para ativar o login.</p>';
+    }
+  }
+
+  async function handleGoogleCredential(response) {
+    try {
+      const resp = await fetch('/api/auth/google', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ credential: response.credential, clientId: 'YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com' }),
+      });
+      const data = await resp.json();
+      if (data.ok) {
+        CryptoUtils.setEmail(data.user.email);
+        UTILS.storage.set('user_name', data.user.name);
+        UTILS.storage.set('user_id', data.user.id);
+        document.getElementById('gsiOverlay')?.remove();
+        // Fetch user session info
+        try {
+          const sessionResp = await fetch('/api/session?t=' + Date.now(), {
+            headers: { 'X-User-Id': data.user.id }
+          });
+          const sessionData = await sessionResp.json();
+          UTILS.storage.set('user_plan', sessionData.plan || 'free');
+        } catch {}
+        updateUserMenu();
+        showToast('✅ Entrou como ' + data.user.name);
+      } else {
+        showToast('Erro ao entrar: ' + (data.error || 'desconhecido'));
+      }
+    } catch (e) {
+      showToast('Erro de conexão ao autenticar');
     }
   }
 

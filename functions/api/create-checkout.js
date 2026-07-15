@@ -6,7 +6,7 @@ export async function onRequest(context) {
   if (request.method !== 'POST') return new Response('Method Not Allowed', { status: 405, headers: CORS });
 
   try {
-    const { plan, success_url, cancel_url } = await request.json();
+    const { plan, success_url, cancel_url, user_id } = await request.json();
     const prices = {
       premium: { price: 4900, name: 'SIGMUND Premium', description: 'Sessões de terapia com IA — dia sim, dia não. Seu espaço de autocuidado, com privacidade total.' },
       wl_essential: { price: 9700, name: 'SIGMUND White Label Essential', description: 'Sua própria plataforma de terapia com IA. Até 30 pacientes, marca personalizada, relatórios automáticos.' },
@@ -31,6 +31,7 @@ export async function onRequest(context) {
       'success_url': success_url || 'https://sigmund-4fn.pages.dev/success',
       'cancel_url': cancel_url || 'https://sigmund-4fn.pages.dev/',
       'metadata[plan]': plan,
+      'metadata[user_id]': user_id || '',
     });
 
     const resp = await fetch('https://api.stripe.com/v1/checkout/sessions', {

@@ -14,8 +14,21 @@ export async function onRequest(context) {
       const session = body.data?.object || {};
       const customerId = session.customer;
       const plan = session.metadata?.plan || 'premium';
-      if (customerId && env.SESSIONS) {
-        await env.SESSIONS.put(`stripe:${customerId}`, JSON.stringify({ plan, active: true, created: new Date().toISOString() }));
+      const userId = session.metadata?.user_id || '';
+      if (env.SESSIONS) {
+        // Store stripe mapping
+        if (customerId) {
+          await env.SESSIONS.put(`stripe:${customerId}`, JSON.stringify({ plan, userId, active: true, created: new Date().toISOString() }));
+        }
+        // Update user plan in KV
+        if (userId) {
+          const userData = await env.SESSIONS.get(`user:${userId}`, 'json');
+          if (userData) {
+            userData.plan = plan;
+            userData.stripeCustomerId = customerId;
+            await env.SESSIONS.put(`user:${userId}`, JSON.stringify(userData));
+          }
+        }
       }
     }
 
@@ -23,8 +36,17 @@ export async function onRequest(context) {
       const invoice = body.data?.object || {};
       const customerId = invoice.customer;
       if (customerId && env.SESSIONS) {
-        const existing = await env.SESSIONS.get(`stripe:${customerId}`, 'json');
-        if (existing) { existing.active = true; existing.lastPaid = new Date().toISOString(); await env.SESSIONS.put(`stripe:${customerId}`, JSON.stringify(existing)); }
+        const stripeData = await env.SESSIONS.get(`stripe:${customerId}`, 'json');
+        if (stripeData) {
+          stripeData.active = true;
+          stripeData.lastPaid = new Date().toISOString();
+          await env.SESSIONS.put(`stripe:${customerId}`, JSON.stringify(stripeData));
+          // Also update user plan
+          if (stripeData.userId) {
+            const userData = await env.SESSIONS.get(`user:${stripeData.userId}`, 'json');
+            if (userData) { userData.plan = stripeData.plan; await env.SESSIONS.put(`user:${stripeData.userId}`, JSON.stringify(userData)); }
+          }
+        }
       }
     }
 
@@ -32,8 +54,15 @@ export async function onRequest(context) {
       const obj = body.data?.object || {};
       const customerId = obj.customer;
       if (customerId && env.SESSIONS) {
-        const existing = await env.SESSIONS.get(`stripe:${customerId}`, 'json');
-        if (existing) { existing.active = false; await env.SESSIONS.put(`stripe:${customerId}`, JSON.stringify(existing)); }
+        const stripeData = await env.SESSIONS.get(`stripe:${customerId}`, 'json');
+        if (stripeData) {
+          stripeData.active = false;
+          await env.SESSIONS.put(`stripe:${customerId}`, JSON.stringify(stripeData));
+          if (stripeData.userId) {
+            const userData = await env.SESSIONS.get(`user:${stripeData.userId}`, 'json');
+            if (userData) { userData.plan = 'free'; await env.SESSIONS.put(`user:${stripeData.userId}`, JSON.stringify(userData)); }
+          }
+        }
       }
     }
 

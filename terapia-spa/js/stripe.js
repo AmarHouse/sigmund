@@ -51,14 +51,15 @@ const SIGMUND_STRIPE = {
     },
   },
 
-  EXTRA_PRICE: 2000,
-  EXTRA_LABEL: 'R$ 20',
+  EXTRA_PRICE: 1990,
+  EXTRA_LABEL: 'R$ 19,90',
 
   async createCheckoutSession(planId, successUrl, cancelUrl) {
+    const userId = UTILS.storage.get('user_id', '');
     const resp = await fetch('/api/create-checkout', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ plan: planId, success_url: successUrl, cancel_url: cancelUrl }),
+      body: JSON.stringify({ plan: planId, success_url: successUrl, cancel_url: cancelUrl, user_id: userId }),
     });
     return resp.json();
   },

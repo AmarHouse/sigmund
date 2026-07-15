@@ -8,10 +8,15 @@ export async function onRequest(context) {
   const userId = request.headers.get('X-User-Id') || 'anonymous';
   const data = env.SESSIONS ? await env.SESSIONS.get(`user:${userId}`, 'json') : null;
 
+  const month = new Date().toISOString().slice(0, 7);
+  const sessionsThisMonth = data?.month === month ? (data?.sessions || 0) : 0;
+
   return new Response(JSON.stringify({
     loggedIn: !!userId && userId !== 'anonymous',
+    name: data?.name || '',
+    email: data?.email || '',
     plan: data?.plan || 'free',
-    sessionsUsed: data?.sessions || 0,
+    sessionsUsed: sessionsThisMonth,
     extraAvailable: data?.extra_available || 0,
     lastSession: data?.last_session || null,
   }), { status: 200, headers: { 'Content-Type': 'application/json', ...CORS } });
