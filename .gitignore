@@ -2,6 +2,10 @@ node_modules/
 browser-state-*.json
 *.png
 *.webp
+!terapia-spa/icon.png
+!terapia-spa/user-avatar.png
+!terapia-spa/avatar.webp
+*.webp
 *.sgm
 *.pdf
 Sessão*
