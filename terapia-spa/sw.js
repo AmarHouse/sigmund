@@ -1,4 +1,4 @@
-const CACHE = 'sigmund-v1';
+const CACHE = 'sigmund-v2';
 const ASSETS = [
   '/',
   '/index.html',
@@ -22,6 +22,8 @@ const ASSETS = [
   '/js/chat.js',
   '/js/api.js',
   '/js/app.js',
+  '/termos.html',
+  '/privacidade.html',
 ];
 
 self.addEventListener('install', event => {

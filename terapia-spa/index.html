@@ -11,10 +11,11 @@
   <meta name="application-name" content="SIGMUND">
   <title>SIGMUND — Terapia com IA. Converse 24h, no seu ritmo.</title>
   <meta name="description" content="SIGMUND é terapia com IA — um espaço seguro para conversar, se ouvir e se entender. Disponível 24 horas por dia. Primeira sessão gratuita.">
-  <meta name="keywords" content="terapia online, IA terapia, saúde mental, psicologia online, bem-estar emocional, terapia com IA, autocuidado">
+  <meta name="keywords" content="terapia online, terapia com IA, saúde mental, psicologia online, bem-estar emocional, autocuidado, terapia digital, acolhimento emocional">
   <meta name="author" content="SIGMUND">
   <meta name="robots" content="index, follow">
   <meta name="language" content="pt-BR">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
 
   <!-- Open Graph / Social -->
   <meta property="og:title" content="SIGMUND — Terapia com IA, 24h">
@@ -22,15 +23,23 @@
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="SIGMUND">
   <meta property="og:locale" content="pt_BR">
+  <meta property="og:url" content="https://sigmund-4fn.pages.dev/">
   <meta property="og:image" content="https://sigmund-4fn.pages.dev/sigmund.webp">
+  <meta property="og:image:width" content="517">
+  <meta property="og:image:height" content="517">
+  <meta property="og:image:alt" content="SIGMUND — Terapia com IA. Ícone do app com fundo escuro e iniciais S.">
+  <meta property="og:determiner" content="o">
 
   <!-- Twitter Card -->
-  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:domain" content="sigmund-4fn.pages.dev">
   <meta name="twitter:title" content="SIGMUND — Terapia com IA, 24h">
   <meta name="twitter:description" content="Converse, se ouça e se entenda. Um espaço seguro de terapia com IA, disponível quando você precisar.">
   <meta name="twitter:image" content="https://sigmund-4fn.pages.dev/sigmund.webp">
+  <meta name="twitter:image:alt" content="SIGMUND — Terapia com IA. Ícone do app.">
+  <meta name="twitter:site" content="@sigmund">
 
-  <link rel="canonical" href="https://sigmund.app">
+  <link rel="canonical" href="https://sigmund-4fn.pages.dev/">
   <link rel="manifest" href="manifest.json">
 
   <!-- Google Analytics (placeholder - substitua G-XXXXXXXXXX pelo seu ID) -->
@@ -55,25 +64,39 @@
     "@context": "https://schema.org",
     "@type": "HealthAndBeautyBusiness",
     "name": "SIGMUND",
+    "alternateName": "Sig",
     "description": "Terapia com IA. Um espaço seguro para conversar, se ouvir e se entender, disponível 24 horas.",
-    "url": "https://sigmund.app",
+    "url": "https://sigmund-4fn.pages.dev/",
     "image": "https://sigmund-4fn.pages.dev/sigmund.webp",
+    "sameAs": [],
+    "foundingDate": "2026",
+    "email": "contato@sigmund.app",
     "offers": {
       "@type": "Offer",
       "price": "49",
       "priceCurrency": "BRL",
-      "description": "Premium - sessões de terapia com IA"
+      "priceValidUntil": "2027-12-31",
+      "description": "Premium — 2 sessões por semana com IA terapeutica",
+      "availability": "https://schema.org/OnlineOnly",
+      "url": "https://sigmund-4fn.pages.dev/"
+    },
+    "potentialAction": {
+      "@type": "CommunicateAction",
+      "description": "Iniciar sessão de terapia com IA",
+      "target": "https://sigmund-4fn.pages.dev/"
     }
   }
   </script>
 
 
-  <script src="https://accounts.google.com/gsi/client" async defer></script>
+  <link rel="preload" as="image" href="sigmund.webp">
+  <link rel="preload" as="style" href="css/variables.css">
   <link rel="stylesheet" href="css/variables.css">
   <link rel="stylesheet" href="css/base.css">
   <link rel="stylesheet" href="css/layout.css">
   <link rel="stylesheet" href="css/chat.css">
   <link rel="stylesheet" href="css/components.css">
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
 <body>
   <div class="app" id="app">
@@ -281,6 +304,11 @@
       <div class="settings-body">
         <div class="settings-group" style="text-align:center;">
           <p style="color:var(--color-text-secondary);font-size:var(--font-size-sm);">SIGMUND — versão 1.0<br>Suas sessões são privadas e armazenadas apenas no seu navegador.</p>
+          <p style="margin-top:var(--space-3);font-size:var(--font-size-xs);color:var(--color-text-tertiary);">
+            <a href="termos" target="_blank" rel="noopener" style="color:var(--color-accent-text,var(--color-accent));text-decoration:underline;">Termos de Serviço</a>
+            &nbsp;·&nbsp;
+            <a href="privacidade" target="_blank" rel="noopener" style="color:var(--color-accent-text,var(--color-accent));text-decoration:underline;">Política de Privacidade</a>
+          </p>
         </div>
         <div class="settings-group" id="googleAuthSection" style="display:none;">
           <span class="settings-label">Entrar com Google</span>
@@ -341,17 +369,17 @@
   </div>
 
 
-  <script src="js/utils.js"></script>
-  <script src="js/crypto.js"></script>
-  <script src="js/stripe.js"></script>
-  <script src="js/dashboard.js"></script>
-  <script src="js/onboarding.js"></script>
-  <script src="js/session.js"></script>
-  <script src="js/kb.js"></script>
-  <script src="js/prompts.js"></script>
-  <script src="js/router.js"></script>
-  <script src="js/api.js"></script>
-  <script src="js/chat.js"></script>
-  <script src="js/app.js"></script>
+  <script defer src="js/utils.js"></script>
+  <script defer src="js/crypto.js"></script>
+  <script defer src="js/stripe.js"></script>
+  <script defer src="js/dashboard.js"></script>
+  <script defer src="js/onboarding.js"></script>
+  <script defer src="js/session.js"></script>
+  <script defer src="js/kb.js"></script>
+  <script defer src="js/prompts.js"></script>
+  <script defer src="js/router.js"></script>
+  <script defer src="js/api.js"></script>
+  <script defer src="js/chat.js"></script>
+  <script defer src="js/app.js"></script>
 </body>
 </html>
