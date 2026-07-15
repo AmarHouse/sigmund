@@ -1,23 +1,21 @@
 :root {
-  /* Decisão intencional de marca: fundo cream quente (#F7F5F0) para transmitir acolhimento.
-     Consciente do risco de 'AI default', mantido por ser apropriado ao contexto terapêutico. */
-  --color-bg: #F7F5F0;
-  --color-bg-soft: #EFEDE8;
+  --color-bg: #F4EFE6;
+  --color-bg-soft: #ECE5DA;
   --color-surface: #FFFFFF;
-  --color-surface-hover: #FAF9F6;
-  --color-border: #E8E4DE;
-  --color-border-light: #F0EDE8;
-  --color-text: #2C2C2C;
-  --color-text-secondary: #6B6B6B;
-  --color-text-tertiary: #7A7A7A;
-  --color-accent: #7BA89A;
-  --color-accent-hover: #6B9A8C;
-  --color-accent-light: #E8F2EF;
-  --color-accent-soft: #F2F7F5;
-  --color-user-bubble: #E3EEEA;
-  --color-user-bubble-text: #1A3B32;
+  --color-surface-hover: #FAF6F0;
+  --color-border: #E2D9CC;
+  --color-border-light: #ECE5DA;
+  --color-text: #2C2722;
+  --color-text-secondary: #706860;
+  --color-text-tertiary: #9A948E;
+  --color-accent: #D4953A;
+  --color-accent-hover: #C4862E;
+  --color-accent-light: #F3E9D6;
+  --color-accent-soft: #FAF4EA;
+  --color-user-bubble: #EBE1D0;
+  --color-user-bubble-text: #2C2722;
   --color-ai-bubble: #FFFFFF;
-  --color-ai-bubble-text: #2C2C2C;
+  --color-ai-bubble-text: #2C2722;
   --color-emergency: #C44A4A;
   --color-emergency-hover: #B03E3E;
   --color-emergency-light: #FDF0F0;
@@ -42,10 +40,10 @@
   --radius-lg: 16px;
   --radius-xl: 20px;
   --radius-full: 9999px;
-  --shadow-sm: 0 1px 2px rgba(44, 44, 44, 0.04);
-  --shadow-md: 0 2px 8px rgba(44, 44, 44, 0.06);
-  --shadow-lg: 0 4px 16px rgba(44, 44, 44, 0.08);
-  --shadow-xl: 0 8px 32px rgba(44, 44, 44, 0.1);
+  --shadow-sm: 0 1px 2px rgba(44, 39, 34, 0.04);
+  --shadow-md: 0 2px 8px rgba(44, 39, 34, 0.06);
+  --shadow-lg: 0 4px 16px rgba(44, 39, 34, 0.08);
+  --shadow-xl: 0 8px 32px rgba(44, 39, 34, 0.1);
   --space-1: 4px;
   --space-2: 8px;
   --space-3: 12px;
@@ -62,6 +60,58 @@
   --transition-fast: 0.15s ease;
   --transition-base: 0.25s ease;
   --transition-slow: 0.4s ease;
+}
+
+[data-theme="dark"] {
+  --color-bg: #1A1714;
+  --color-bg-soft: #221F1B;
+  --color-surface: #2C2824;
+  --color-surface-hover: #34302C;
+  --color-border: #3C3834;
+  --color-border-light: #34302C;
+  --color-text: #E5E0D8;
+  --color-text-secondary: #A8A49E;
+  --color-text-tertiary: #8A8480;
+  --color-accent: #E8B84A;
+  --color-accent-hover: #D4A63E;
+  --color-accent-light: #3A3020;
+  --color-accent-soft: #2A2518;
+  --color-user-bubble: #3A3020;
+  --color-user-bubble-text: #E5DCC4;
+  --color-ai-bubble: #2C2824;
+  --color-ai-bubble-text: #E5E0D8;
+  --color-emergency-light: #3A2020;
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.2);
+  --shadow-md: 0 2px 8px rgba(0, 0, 0, 0.3);
+  --shadow-lg: 0 4px 16px rgba(0, 0, 0, 0.35);
+  --shadow-xl: 0 8px 32px rgba(0, 0, 0, 0.4);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --color-bg: #1A1714;
+    --color-bg-soft: #221F1B;
+    --color-surface: #2C2824;
+    --color-surface-hover: #34302C;
+    --color-border: #3C3834;
+    --color-border-light: #34302C;
+    --color-text: #E5E0D8;
+    --color-text-secondary: #A8A49E;
+    --color-text-tertiary: #8A8480;
+    --color-accent: #E8B84A;
+    --color-accent-hover: #D4A63E;
+    --color-accent-light: #3A3020;
+    --color-accent-soft: #2A2518;
+    --color-user-bubble: #3A3020;
+    --color-user-bubble-text: #E5DCC4;
+    --color-ai-bubble: #2C2824;
+    --color-ai-bubble-text: #E5E0D8;
+    --color-emergency-light: #3A2020;
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.2);
+    --shadow-md: 0 2px 8px rgba(0, 0, 0, 0.3);
+    --shadow-lg: 0 4px 16px rgba(0, 0, 0, 0.35);
+    --shadow-xl: 0 8px 32px rgba(0, 0, 0, 0.4);
+  }
 }
 
 [data-theme="dark"] {

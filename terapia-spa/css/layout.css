@@ -161,8 +161,8 @@
 }
 
 /* Landing Page */
-.lp-hero { margin-bottom: var(--space-4); }
-.lp-icon { width: 72px; height: 72px; border-radius: 18px; object-fit: cover; margin-bottom: var(--space-3); box-shadow: 0 8px 32px rgba(0,0,0,0.1); }
+.lp-hero { margin-bottom: var(--space-4); display: flex; flex-direction: column; align-items: center; }
+.lp-icon { width: 72px; height: 72px; border-radius: 18px; object-fit: cover; box-shadow: 0 8px 32px rgba(0,0,0,0.1); }
 .lp-title { font-size: var(--font-size-2xl); font-weight: var(--font-weight-bold); letter-spacing: -0.5px; margin: 0; color: var(--color-text); }
 .lp-subtitle { font-size: var(--font-size-lg); color: var(--color-accent); font-weight: var(--font-weight-medium); margin: var(--space-1) 0 0; }
 .lp-description { font-size: var(--font-size-sm); color: var(--color-text-tertiary); max-width: 420px; line-height: var(--line-height-relaxed); margin: var(--space-2) 0 var(--space-4); }
@@ -413,12 +413,12 @@
   background: var(--color-accent);
   border-color: var(--color-accent);
   color: white;
-  box-shadow: 0 4px 15px rgba(99, 102, 241, 0.25);
+  box-shadow: 0 4px 15px rgba(212, 149, 58, 0.3);
 }
 
 .welcome-btn-primary:hover {
   background: var(--color-accent-hover, var(--color-accent));
-  box-shadow: 0 6px 25px rgba(99, 102, 241, 0.35);
+  box-shadow: 0 6px 25px rgba(212, 149, 58, 0.4);
 }
 
 .welcome-btn-icon {
