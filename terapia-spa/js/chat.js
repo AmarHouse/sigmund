@@ -199,6 +199,10 @@ const Chat = {
       const msgCount = SessionManager.current?.messages?.length || 0;
       const firstUserIdx = SessionManager.current?.messages?.findIndex(m => m.role === 'user' && !m.imported) || 0;
       const sessionMsgCount = msgCount - firstUserIdx;
+
+      // Update session progress indicator
+      this._updateProgress(sessionMsgCount);
+
       if (sessionMsgCount >= 48 && sessionMsgCount % 2 === 0) {
         this._autoExport();
       }
@@ -256,20 +260,38 @@ const Chat = {
   _addTypingIndicator() {
     const container = document.getElementById('chatMessages');
     const div = document.createElement('div');
-    div.className = 'message-typing';
+    div.className = 'message assistant';
     div.id = 'typingIndicator';
+    div.style.animation = 'messageSlideIn 0.3s ease-out';
 
     const avatar = document.createElement('img');
     avatar.className = 'message-avatar';
+    avatar.style.alignSelf = 'flex-start';
     avatar.src = 'avatar.webp';
     avatar.alt = 'SIGMUND';
 
-    const indicator = document.createElement('div');
-    indicator.className = 'typing-indicator';
-    indicator.innerHTML = '<div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div>';
+    const contentDiv = document.createElement('div');
+    contentDiv.className = 'message-content';
 
+    const body = document.createElement('div');
+    body.className = 'message-body';
+    body.style.cssText = 'min-width:120px;display:flex;flex-direction:column;gap:6px;padding:var(--space-4) var(--space-5);';
+
+    const lines = [
+      { width: '75%', height: '12px' },
+      { width: '50%', height: '12px' },
+      { width: '60%', height: '12px' },
+    ];
+    lines.forEach(l => {
+      const bar = document.createElement('div');
+      bar.className = 'skeleton-loading';
+      bar.style.cssText = `width:${l.width};height:${l.height}px;border-radius:6px;background:var(--color-border);`;
+      body.appendChild(bar);
+    });
+
+    contentDiv.appendChild(body);
     div.appendChild(avatar);
-    div.appendChild(indicator);
+    div.appendChild(contentDiv);
     container.appendChild(div);
 
     this._scrollToBottom();
@@ -282,6 +304,13 @@ const Chat = {
       const existing = document.getElementById('typingIndicator');
       if (existing) existing.remove();
     }
+  },
+
+  _updateProgress(msgCount) {
+    const el = document.getElementById('sessionProgress');
+    if (!el) return;
+    const pct = Math.min(msgCount / 50 * 100, 100);
+    el.style.width = pct + '%';
   },
 
   _scrollToBottom() {

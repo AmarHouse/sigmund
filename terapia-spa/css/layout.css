@@ -282,6 +282,23 @@
   cursor: pointer;
 }
 
+.session-progress-bar {
+  width: 60px;
+  height: 3px;
+  background: var(--color-border);
+  border-radius: 4px;
+  overflow: hidden;
+  margin-left: var(--space-2);
+}
+
+.session-progress-fill {
+  height: 100%;
+  width: 0%;
+  background: var(--color-accent);
+  border-radius: 4px;
+  transition: width 0.5s ease;
+}
+
 .suggestion-btn:hover {
   background: var(--color-accent-light);
   border-color: var(--color-accent);

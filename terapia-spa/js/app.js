@@ -336,10 +336,12 @@
 
   function updateSessionIndicator() {
     const el = document.getElementById('sessionIndicator');
+    const progress = document.querySelector('.session-progress-bar');
     const session = SessionManager.current;
     if (session) {
       el.style.display = 'inline';
       el.textContent = session.title;
+      if (progress) progress.style.display = 'block';
     }
   }
 
