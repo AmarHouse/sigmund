@@ -264,6 +264,26 @@
         showToast('Erro ao importar: formato inválido');
       }
     });
+
+    // Premium button in header
+    const premiumBtn = document.getElementById('headerPremiumBtn');
+    if (premiumBtn) {
+      premiumBtn.addEventListener('click', () => {
+        if (typeof SIGMUND_STRIPE !== 'undefined') SIGMUND_STRIPE.showPlans();
+      });
+    }
+
+    // Nav buttons
+    const navBtns = document.querySelectorAll('.nav-item');
+    const setupNav = () => {
+      document.getElementById('navPremiumBtn')?.addEventListener('click', () => {
+        if (typeof SIGMUND_STRIPE !== 'undefined') SIGMUND_STRIPE.showPlans();
+      });
+      document.getElementById('navWLBtn')?.addEventListener('click', () => {
+        if (typeof SIGMUND_STRIPE !== 'undefined') SIGMUND_STRIPE.showWLInfo();
+      });
+    };
+    setupNav();
   }
 
   function setupExport() {

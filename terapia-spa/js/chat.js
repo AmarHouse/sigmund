@@ -40,22 +40,25 @@ const Chat = {
     const firstNumber = SessionManager.current?.number || '';
     const hasLastSession = !!UTILS.storage.get('last_session', null) || !!UTILS.storage.get('last_session_encrypted', null);
 
+    const email = CryptoUtils.getEmail();
+    const hasAccount = !!email;
+
     container.insertAdjacentHTML('afterbegin', `
       <div class="chat-welcome" id="welcomeScreen">
         <img class="chat-welcome-icon-img" src="icon.png" alt="SIGMUND">
         <h1>SIGMUND</h1>
         ${firstNumber ? `<p class="welcome-session-label">Sessão ${firstNumber}</p>` : ''}
-        <p>Bem-vindo ao seu espaço de conversa. Aqui você pode falar sobre o que estiver sentindo, de forma livre e sem julgamentos.</p>
+        <p>Seu espaço de conversa, sem julgamentos. Aqui você pode falar sobre o que estiver sentindo, no seu tempo.</p>
         <div class="welcome-actions">
           <button class="welcome-btn welcome-btn-primary" id="welcomeFirstSession">
             <span class="welcome-btn-icon">&#x1F331;</span>
-            <span class="welcome-btn-label">Primeira sessão</span>
-            <span class="welcome-btn-desc">Começar do zero</span>
+            <span class="welcome-btn-label">Conversar agora</span>
+            <span class="welcome-btn-desc">Primeira sessão gratuita</span>
           </button>
           <button class="welcome-btn" id="welcomeImport">
             <span class="welcome-btn-icon">&#x1F4C2;</span>
-            <span class="welcome-btn-label">Continuar sessão</span>
-            <span class="welcome-btn-desc">Importar arquivo .sgm</span>
+            <span class="welcome-btn-label">Importar sessão</span>
+            <span class="welcome-btn-desc">Continuar de onde parou</span>
           </button>
           ${hasLastSession ? `
           <button class="welcome-btn" id="welcomeRedownload">
@@ -64,7 +67,22 @@ const Chat = {
             <span class="welcome-btn-desc">Baixar .sgm salvo</span>
           </button>` : ''}
         </div>
+        ${!hasAccount ? `
+        <p style="font-size:var(--font-size-xs);color:var(--color-text-tertiary);margin-top:var(--space-4);">
+          Grátis para começar. Depois, <a href="#" id="welcomeSeePlans" style="color:var(--color-accent);text-decoration:underline;">veja os planos</a>.
+        </p>` : ''}
       </div>`);
+
+    // Wire plan link
+    setTimeout(() => {
+      const plansLink = document.getElementById('welcomeSeePlans');
+      if (plansLink) {
+        plansLink.addEventListener('click', (e) => {
+          e.preventDefault();
+          if (typeof SIGMUND_STRIPE !== 'undefined') SIGMUND_STRIPE.showPlans();
+        });
+      }
+    }, 0);
 
     // Add re-download handler
     setTimeout(() => {
