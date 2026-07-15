@@ -606,44 +606,29 @@
     overflow-x: hidden;
   }
 
-  /* Header */
+  /* Header - compacto */
   .app-header {
     height: var(--header-height);
-    padding: 0 var(--space-3);
-  }
-  .app-logo-badge {
-    display: none;
-  }
-  .app-logo-icon {
-    width: 24px;
-    height: 24px;
-  }
-  .app-logo-text {
-    font-size: var(--font-size-md);
-  }
-  .header-btn {
-    width: 32px;
-    height: 32px;
-  }
-  .header-btn svg {
-    width: 16px;
-    height: 16px;
-  }
-  .header-btn-primary {
-    font-size: 11px;
     padding: 0 var(--space-2);
-    height: 28px;
   }
-  .header-user span {
-    font-size: 11px;
+  .app-logo-badge { display: none; }
+  .app-logo-icon { width: 22px; height: 22px; }
+  .app-logo-text { font-size: var(--font-size-sm); }
+  #sessionIndicator { display: none !important; }
+  .session-progress-bar { display: none !important; }
+  #headerPremiumBtn { display: none; }
+
+  .header-btn {
+    width: 30px;
+    height: 30px;
   }
-  #userPlanBadge {
-    display: none !important;
-  }
-  .session-progress-bar {
-    width: 40px;
-    height: 2px;
-  }
+  .header-btn svg { width: 15px; height: 15px; }
+  #newSessionBtn2 { display: none; }
+
+  .header-user { gap: var(--space-1); }
+  .header-user span { font-size: 10px; }
+  #userPlanBadge { display: none !important; }
+  #themeToggle { display: none; }
 
   /* Welcome / Landing */
   .chat-welcome {
@@ -759,15 +744,15 @@
   /* Nav */
   .app-nav {
     height: var(--nav-height);
-    padding: 0 var(--space-2) env(safe-area-inset-bottom, 0px);
+    padding: 0 env(safe-area-inset-right, 0px) env(safe-area-inset-bottom, 0px) env(safe-area-inset-left, 0px);
     gap: 0;
-    justify-content: space-around;
+    justify-content: space-evenly;
   }
   .nav-item {
-    padding: var(--space-1) var(--space-2);
+    padding: var(--space-1);
     gap: 0;
     min-width: 0;
-    flex: 1;
+    flex: 0 1 auto;
   }
   .nav-item svg {
     width: 20px;
@@ -776,16 +761,14 @@
   .nav-item span {
     display: none;
   }
+  /* Hide the dashboard nav button since it's only for WL */
+  #dashboardNavBtn {
+    display: none !important;
+  }
 
-  /* Emergency FAB */
+  /* Emergency FAB - hidden on mobile, use inline crisis link instead */
   .emergency-fab {
-    width: 48px;
-    height: 48px;
-    bottom: calc(var(--nav-height) + 20px + env(safe-area-inset-bottom, 0px));
-    right: calc(var(--space-3) + env(safe-area-inset-right, 0px));
-    font-size: 20px;
-    box-shadow: 0 4px 16px rgba(196, 74, 74, 0.35);
-    z-index: 100;
+    display: none;
   }
 
   /* Modals */
