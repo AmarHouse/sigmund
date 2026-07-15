@@ -235,8 +235,27 @@
 }
 
 @keyframes typingPulse {
-  0%, 100% { opacity: 0.3; transform: scale(0.95); }
-  50% { opacity: 1; transform: scale(1); }
+  0%, 100% { opacity: 0.3; transform: scaleY(0.8); }
+  50% { opacity: 1; transform: scaleY(1); }
+}
+
+@keyframes barPulse {
+  0% { opacity: 0.25; }
+  50% { opacity: 0.8; }
+  100% { opacity: 0.25; }
+}
+
+.typing-bar {
+  animation: barPulse 1.4s ease-in-out infinite;
+}
+
+.typing-label {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-tertiary);
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 4px;
 }
 
 .typing-dot {

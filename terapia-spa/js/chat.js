@@ -393,16 +393,23 @@ const Chat = {
 
     const body = document.createElement('div');
     body.className = 'message-body';
-    body.style.cssText = 'min-width:120px;display:flex;flex-direction:column;gap:6px;padding:var(--space-4) var(--space-5);';
+    body.style.cssText = 'min-width:160px;display:flex;flex-direction:column;gap:8px;padding:var(--space-4) var(--space-5);';
 
+    // "Pensando" text
+    const label = document.createElement('div');
+    label.style.cssText = 'font-size:var(--font-size-xs);color:var(--color-text-tertiary);font-weight:500;margin-bottom:2px;';
+    label.textContent = 'Pensando';
+    body.appendChild(label);
+
+    // Skeleton bars with better animation
     const lines = [
-      { width: '75%', height: '12px' },
-      { width: '50%', height: '12px' },
-      { width: '60%', height: '12px' },
+      { width: '85%', height: '10px' },
+      { width: '55%', height: '10px' },
+      { width: '70%', height: '10px' },
     ];
     lines.forEach(l => {
       const bar = document.createElement('div');
-      bar.className = 'skeleton-loading';
+      bar.className = 'typing-bar';
       bar.style.cssText = `width:${l.width};height:${l.height}px;border-radius:6px;background:var(--color-border);`;
       body.appendChild(bar);
     });
