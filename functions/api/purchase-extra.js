@@ -16,6 +16,7 @@ export async function onRequest(context) {
       'payment_method_types[]': 'card',
       'line_items[0][price_data][currency]': 'brl',
       'line_items[0][price_data][product_data][name]': 'SIGMUND — Sessão Extra',
+      'line_items[0][price_data][product_data][description]': 'Continue sua conversa agora. Uma sessão extra de até 50 mensagens com SIGMUND.',
       'line_items[0][price_data][unit_amount]': '2000',
       'line_items[0][quantity]': '1',
       'success_url': success_url || 'https://sigmund-4fn.pages.dev/',

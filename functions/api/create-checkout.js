@@ -8,9 +8,9 @@ export async function onRequest(context) {
   try {
     const { plan, success_url, cancel_url } = await request.json();
     const prices = {
-      premium: { price: 4900, name: 'SIGMUND Premium' },
-      wl_essential: { price: 9700, name: 'SIGMUND White Label Essential' },
-      wl_pro: { price: 19700, name: 'SIGMUND White Label Pro' },
+      premium: { price: 4900, name: 'SIGMUND Premium', description: 'Sessões de terapia com IA — dia sim, dia não. Seu espaço de autocuidado, com privacidade total.' },
+      wl_essential: { price: 9700, name: 'SIGMUND White Label Essential', description: 'Sua própria plataforma de terapia com IA. Até 30 pacientes, marca personalizada, relatórios automáticos.' },
+      wl_pro: { price: 19700, name: 'SIGMUND White Label Pro', description: 'Até 60 pacientes, suporte prioritário, painel completo do psicólogo.' },
     };
     const selected = prices[plan];
     if (!selected) return new Response(JSON.stringify({ error: 'Plano inválido' }), { status: 200, headers: { 'Content-Type': 'application/json', ...CORS } });
@@ -24,6 +24,7 @@ export async function onRequest(context) {
       'payment_method_types[]': 'card',
       'line_items[0][price_data][currency]': 'brl',
       'line_items[0][price_data][product_data][name]': selected.name,
+      'line_items[0][price_data][product_data][description]': selected.description,
       'line_items[0][price_data][recurring][interval]': 'month',
       'line_items[0][price_data][unit_amount]': String(selected.price),
       'line_items[0][quantity]': '1',
