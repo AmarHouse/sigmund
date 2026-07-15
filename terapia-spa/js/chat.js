@@ -57,8 +57,8 @@ const Chat = {
           </button>
           <button class="welcome-btn" id="welcomeImport">
             <span class="welcome-btn-icon">&#x1F4C2;</span>
-            <span class="welcome-btn-label">Importar sessão</span>
-            <span class="welcome-btn-desc">Continuar de onde parou</span>
+            <span class="welcome-btn-label">Continuar de onde parei</span>
+            <span class="welcome-btn-desc">Importar conversa salva</span>
           </button>
           ${hasLastSession ? `
           <button class="welcome-btn" id="welcomeRedownload">

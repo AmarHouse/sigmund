@@ -55,9 +55,14 @@
         </div>
       </div>
       <div class="app-header-right">
+        <div class="header-user" id="userMenu" style="display:flex;align-items:center;gap:var(--space-2);">
+          <span id="userNameDisplay" style="display:none;font-size:var(--font-size-xs);font-weight:var(--font-weight-medium);color:var(--color-text);padding:0 var(--space-1);"></span>
+          <span id="userPlanBadge" style="display:none;font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:0.3px;background:var(--color-accent);color:white;padding:1px 8px;border-radius:10px;"></span>
+          <button id="loginBtn" class="header-btn" title="Entrar" aria-label="Entrar" style="font-size:var(--font-size-xs);font-weight:var(--font-weight-medium);">Entrar</button>
+        </div>
         <button class="header-btn header-btn-primary" id="headerPremiumBtn" title="Ver planos" aria-label="Planos">
           <span style="font-size:13px;">&#x2B50;</span>
-          <span>Premium</span>
+          <span>Planos</span>
         </button>
         <button class="header-btn" id="themeToggle" title="Alternar tema" aria-label="Alternar tema">
           <svg id="themeIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -120,25 +125,25 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
         </svg>
-        <span>Sessão</span>
+        <span>Conversar</span>
       </button>
       <button class="nav-item" id="navPremiumBtn">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
         </svg>
-        <span>Premium</span>
+        <span>Planos</span>
       </button>
       <button class="nav-item" id="navWLBtn">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
         </svg>
-        <span>Psicólogos</span>
+        <span>Profissionais</span>
       </button>
       <button class="nav-item" id="exportNavBtn">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="10 12 14 12"/><line x1="12" y1="10" x2="12" y2="14"/>
         </svg>
-        <span>Exportar</span>
+        <span>Salvar</span>
       </button>
       <button class="nav-item" id="dashboardNavBtn" style="display:none;">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -150,7 +155,7 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="10 12 14 12"/><line x1="12" y1="10" x2="12" y2="14"/><polyline points="17 8 12 3 7 8"/>
         </svg>
-        <span>Importar</span>
+        <span>Continuar</span>
       </button>
       <input type="file" id="importFileInput" accept=".sgm,.md" style="display:none">
     </nav>

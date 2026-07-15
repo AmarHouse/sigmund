@@ -14,6 +14,7 @@
     }
 
     updateSessionIndicator();
+    updateUserMenu();
 
     // Auto night mode (22h-6h)
     const hour = new Date().getHours();
@@ -259,7 +260,7 @@
         Chat.loadSession(SessionManager.current.messages);
         Chat._hideWelcome();
         fileInput.value = '';
-        showToast(`${parsed.messages.length} mensagens importadas`);
+        showToast(`Conversa restaurada — ${parsed.messages.length} mensagens 💬`);
       } catch (e) {
         showToast('Erro ao importar: formato inválido');
       }
@@ -307,7 +308,7 @@
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
-      showToast('Sessão exportada');
+      showToast('Conversa salva 💾');
     });
   }
 
@@ -338,6 +339,32 @@
       el.style.display = 'inline';
       el.textContent = session.title;
       if (progress) progress.style.display = 'block';
+    }
+  }
+
+  function updateUserMenu() {
+    const nameEl = document.getElementById('userNameDisplay');
+    const planEl = document.getElementById('userPlanBadge');
+    const loginBtn = document.getElementById('loginBtn');
+    if (!nameEl || !loginBtn) return;
+
+    const email = CryptoUtils.getEmail();
+    const name = UTILS.storage.get('user_name', '');
+    if (email) {
+      loginBtn.style.display = 'none';
+      nameEl.style.display = 'inline';
+      nameEl.textContent = `👤 ${name || email.split('@')[0]}`;
+      if (planEl) {
+        planEl.style.display = 'inline';
+        planEl.textContent = '⭐ Premium';
+      }
+    } else {
+      loginBtn.style.display = 'inline-flex';
+      nameEl.style.display = 'none';
+      if (planEl) planEl.style.display = 'none';
+      loginBtn.addEventListener('click', () => {
+        if (typeof SIGMUND_STRIPE !== 'undefined') SIGMUND_STRIPE.showPremiumPlans();
+      });
     }
   }
 
