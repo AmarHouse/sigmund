@@ -133,10 +133,14 @@ const SessionManager = {
       `# ${session.title}`,
       `- data: ${session.created}`,
       `- duracao: ${this._getDuration(session)}`,
-      '',
-      '---',
-      ''
     ];
+
+    const email = CryptoUtils.getEmail();
+    if (email) {
+      lines.push(`- owner: ${CryptoUtils.hashEmail(email)}`);
+    }
+
+    lines.push('', '---', '');
 
     for (const msg of session.messages) {
       const role = msg.role === 'user' ? 'usuario' : 'terapeuta';
@@ -195,6 +199,17 @@ const SessionManager = {
     let currentContent = [];
     let inNotes = false;
     let inSummary = false;
+    let fileOwner = null;
+
+    // Check owner hash
+    const ownerLine = lines.find(l => l.startsWith('- owner:'));
+    if (ownerLine) fileOwner = ownerLine.replace('- owner:', '').trim();
+    const email = CryptoUtils.getEmail();
+    if (fileOwner && email) {
+      if (fileOwner !== CryptoUtils.hashEmail(email)) {
+        return { title: '', messages: [], notes: '', summary: '', error: 'Este arquivo pertence a outro usuário. Faça login com a conta correta para importá-lo.' };
+      }
+    }
 
     for (const line of lines) {
       if (line.startsWith('# sumario')) {

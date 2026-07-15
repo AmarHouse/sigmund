@@ -98,6 +98,51 @@
       }
     }
 
+    // PIN setup
+    const pinInput = document.getElementById('pinInput');
+    const pinSaveBtn = document.getElementById('pinSaveBtn');
+    const pinStatus = document.getElementById('pinStatus');
+
+    if (CryptoUtils.hasPin()) {
+      pinInput.value = CryptoUtils.getPin();
+      pinStatus.textContent = '✅ PIN ativo';
+      pinStatus.style.color = 'var(--color-success)';
+    }
+
+    pinSaveBtn.addEventListener('click', () => {
+      const pin = pinInput.value.trim();
+      if (pin.length !== 4 || !/^\d{4}$/.test(pin)) {
+        pinStatus.textContent = '❌ O PIN deve ter exatamente 4 dígitos';
+        pinStatus.style.color = 'var(--color-emergency)';
+        return;
+      }
+      CryptoUtils.setPin(pin);
+      pinStatus.textContent = '✅ PIN salvo com sucesso';
+      pinStatus.style.color = 'var(--color-success)';
+      showToast('PIN salvo');
+    });
+
+    // Google OAuth
+    const googleSection = document.getElementById('googleAuthSection');
+    const loginBtn = document.getElementById('googleLoginBtn');
+    const userInfo = document.getElementById('googleUserInfo');
+    const userName = document.getElementById('googleUserName');
+    const userEmail = document.getElementById('googleUserEmail');
+
+    if (CryptoUtils.hasEmail()) {
+      googleSection.style.display = 'block';
+      loginBtn.style.display = 'none';
+      userInfo.style.display = 'block';
+      userName.textContent = UTILS.storage.get('user_name', '');
+      userEmail.textContent = CryptoUtils.getEmail();
+    } else {
+      googleSection.style.display = 'block';
+      // OAuth will be integrated when Google Client ID is configured
+      loginBtn.addEventListener('click', () => {
+        showToast('Login com Google será ativado em breve');
+      });
+    }
+
     btn.addEventListener('click', () => {
       modal.classList.remove('modal-hidden');
       if (status) status.style.display = 'none';
@@ -150,6 +195,11 @@
       try {
         const text = await file.text();
         const parsed = SessionManager.importFromMarkdown(text);
+        if (parsed.error) {
+          showToast(parsed.error);
+          fileInput.value = '';
+          return;
+        }
         if (parsed.messages.length === 0) {
           showToast('Arquivo vazio ou formato inválido');
           return;

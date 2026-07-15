@@ -172,6 +172,24 @@
         <div class="settings-group" style="text-align:center;">
           <p style="color:var(--color-text-secondary);font-size:var(--font-size-sm);">SIGMUND — versão 1.0<br>Suas sessões são privadas e armazenadas apenas no seu navegador.</p>
         </div>
+        <div class="settings-group" id="googleAuthSection" style="display:none;">
+          <span class="settings-label">Entrar com Google</span>
+          <span class="settings-description">Proteja suas sessões e acesse de qualquer lugar.</span>
+          <button class="settings-btn primary" id="googleLoginBtn" style="margin-top:var(--space-2);">Entrar com Google</button>
+          <div id="googleUserInfo" style="display:none;margin-top:var(--space-2);padding:var(--space-2);background:var(--color-accent-soft);border-radius:var(--radius-md);">
+            <span id="googleUserName" style="font-weight:var(--font-weight-medium);"></span>
+            <span id="googleUserEmail" style="display:block;font-size:var(--font-size-xs);color:var(--color-text-tertiary);"></span>
+          </div>
+        </div>
+        <div class="settings-group">
+          <span class="settings-label">Proteger com PIN</span>
+          <span class="settings-description">Um PIN de 4 dígitos protege suas sessões em computadores compartilhados.</span>
+          <div style="display:flex;gap:var(--space-2);margin-top:var(--space-2);">
+            <input type="password" class="settings-input" id="pinInput" placeholder="4 dígitos" maxlength="4" inputmode="numeric" pattern="[0-9]*" style="width:100px;text-align:center;font-size:18px;letter-spacing:4px;">
+            <button class="settings-btn primary" id="pinSaveBtn" style="flex-shrink:0;">Salvar PIN</button>
+          </div>
+          <div id="pinStatus" style="font-size:var(--font-size-xs);margin-top:var(--space-1);"></div>
+        </div>
         <div class="settings-group">
           <div class="settings-toggle">
             <div>
@@ -214,6 +232,7 @@
 
 
   <script src="js/utils.js"></script>
+  <script src="js/crypto.js"></script>
   <script src="js/session.js"></script>
   <script src="js/kb.js"></script>
   <script src="js/prompts.js"></script>
